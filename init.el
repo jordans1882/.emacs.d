@@ -212,6 +212,12 @@
      ((member project-type '(gradle grails)) "Spec")))
 
   )
+(use-package pyvenv
+  :straight t
+  )
+(use-package python-pytest
+  :straight t
+  )
 (use-package ob-mermaid
   :straight t
   :config
