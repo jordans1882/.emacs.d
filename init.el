@@ -20,6 +20,9 @@
 
 ;; Use packages with configs
 
+(use-package ace-jump-mode
+  :straight t
+  )
 (use-package alert
   :straight t
   :commands (alert)
@@ -35,9 +38,10 @@
   :straight t
   :after counsel
   :init (all-the-icons-ivy-rich-mode 1))
-(use-package ace-jump-mode
+(use-package auctex-latexmk
   :straight t
-  )
+  :config
+  (auctex-latexmk-setup))
 (use-package conda
   :straight t
   :init
