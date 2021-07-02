@@ -122,6 +122,10 @@
 (use-package clojure-mode
   :straight t
   )
+(use-package cmake-ide
+  :straight t
+  :config
+  (cmake-ide-setup))
 (use-package command-log-mode
   :straight t
   )
