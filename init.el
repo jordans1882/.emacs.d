@@ -18,9 +18,7 @@
 ;; Integrate straight.el with use-package
 (straight-use-package 'use-package)
 
-
 ;; Use packages with configs
-(setq evil-want-keybinding nil)
 
 (use-package counsel
   :straight t
@@ -47,8 +45,47 @@
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+(use-package emacs
+  :config
+    ;; Appearance
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1)
+    (set-frame-parameter (selected-frame) 'alpha '(95 50))
+    (add-to-list 'default-frame-alist '(alpha 95 50))
+    (tool-bar-mode -1)
+
+    (setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
+
+    ;; Utility funs
+    (defun dawn ()
+	"Set theme to day"
+	(interactive)
+	(counsel-load-theme-action "doom-gruvbox-light"))
+    (defun day ()
+	"Set theme to day"
+	(interactive)
+	(counsel-load-theme-action "doom-solarized-light"))
+    (defun sunny ()
+	"Set theme to day"
+	(interactive)
+	(counsel-load-theme-action "doom-nord-light"))
+    (defun dusk ()
+	"Set theme to dusk"
+	(interactive)
+	(counsel-load-theme-action "doom-nova"))
+    (defun evening ()
+	"Set theme to evening"
+	(interactive)
+	(counsel-load-theme-action "doom-gruvbox"))
+    (defun late-night ()
+	"Set theme to night"
+	(interactive)
+	(counsel-load-theme-action "doom-Iosvkem"))
+  )
 (use-package evil
    :straight t
+   :init
+   (setq evil-want-keybinding nil)
    :config
    (evil-mode 1)
    (setq-default evil-escape-delay 0.05)
@@ -343,30 +380,6 @@
 
 
 ;; Define color themes switcher funs
-(defun dawn ()
-  "Set theme to day"
-  (interactive)
-  (counsel-load-theme-action "doom-gruvbox-light"))
-(defun day ()
-  "Set theme to day"
-  (interactive)
-  (counsel-load-theme-action "doom-solarized-light"))
-(defun sunny ()
-  "Set theme to day"
-  (interactive)
-  (counsel-load-theme-action "doom-nord-light"))
-(defun dusk ()
-  "Set theme to dusk"
-  (interactive)
-  (counsel-load-theme-action "doom-nova"))
-(defun evening ()
-  "Set theme to evening"
-  (interactive)
-  (counsel-load-theme-action "doom-gruvbox"))
-(defun late-night ()
-  "Set theme to night"
-  (interactive)
-  (counsel-load-theme-action "doom-Iosvkem"))
 
 
 ;; Local Variables:
