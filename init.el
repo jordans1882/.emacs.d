@@ -189,6 +189,17 @@
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+(use-package dumb-jump
+  :straight t
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g b" . dumb-jump-back)
+         ("M-g i" . dumb-jump-go-prompt)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  )
 (use-package elpy
   :straight t
   :init
