@@ -1,6 +1,6 @@
 .saves/
-auto-save-list/
 straight/
 transient/
-projectile-bookmarks.eld
 projectile.cache
+projectile-bookmarks.eld
+auto-save-list/

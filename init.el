@@ -23,6 +23,11 @@
 (use-package counsel
   :straight t
   )
+(use-package counsel-projectile
+  :straight t
+  :config
+  (counsel-projectile-mode)
+  (setq projectile-indexing-method 'native))
 (use-package doom-modeline
       :straight t
       :hook (after-init . doom-modeline-mode))
@@ -140,6 +145,22 @@
   )
 (use-package magit
   :straight t
+  )
+(use-package projectile
+  :straight t
+  :config
+  (projectile-mode)
+  (setq projectile-completion-system 'ivy)
+  (defun projectile-test-suffix (project-type)
+    "Find default test files suffix based on PROJECT-TYPE."
+    (cond
+     ((member project-type '(rails-rspec ruby-rspec)) "_spec")
+     ((member project-type '(rails-test ruby-test lein-test go)) "_test")
+     ((member project-type '(r)) "_test")
+     ((member project-type '(scons)) "test")
+     ((member project-type '(maven symfony)) "Test")
+     ((member project-type '(gradle grails)) "Spec")))
+
   )
 (use-package orderless
   :straight t
