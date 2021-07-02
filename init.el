@@ -325,6 +325,14 @@
   :config
   (evil-collection-init)
   )
+(use-package evil-snipe
+  :straight t
+  :config
+  (evil-snipe-mode +1)
+  (evil-snipe-override-mode +1))
+(use-package evil-nerd-commenter
+  :straight t
+  )
 (use-package flycheck
   :straight t
   :config
