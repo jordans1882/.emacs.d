@@ -1111,7 +1111,10 @@
   (yas-global-mode 1)
   ;;(setq yas-snippet-dirs '("~/git_repos/misenplace-snippets"))
     )
-
+(use-package slime
+  :straight t
+  :config
+  (setq inferior-lisp-program "sbcl"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
