@@ -160,7 +160,6 @@
   :config
   (evil-collection-init)
   )
-
 (use-package git-messenger
   :straight t
   )
