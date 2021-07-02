@@ -38,6 +38,12 @@
 (use-package ace-jump-mode
   :straight t
   )
+(use-package conda
+  :straight t
+  :init
+  (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
+  ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs"))
+  )
 (use-package counsel
   :straight t
   )
@@ -75,6 +81,10 @@
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+(use-package elpy
+  :straight t
+  :init
+  (elpy-enable))
 (use-package emacs
   :config
     ;; Appearance
