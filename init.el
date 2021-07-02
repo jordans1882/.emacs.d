@@ -1101,6 +1101,10 @@
   (define-key my-leader-map "y" '("yas-prefix"))
   (define-key my-leader-map "yy" 'yas-insert-snippet)
   )
+(use-package ws-butler
+  :straight t
+  :config
+  (add-hook 'prog-mode-hook #'ws-butler-mode))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
