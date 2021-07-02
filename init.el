@@ -164,6 +164,9 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png"))
+(use-package dockerfile-mode
+  :straight t
+  )
 (use-package doom-modeline
       :straight t
       :hook (after-init . doom-modeline-mode))
@@ -293,6 +296,9 @@
   ;; If you would like to use git-gutter.el and linum-mode
   ;;(git-gutter:linum-setup)
   )
+(use-package go-mode
+  :straight t
+  )
 (use-package irony
   :straight t
   :config
@@ -317,9 +323,16 @@
 (use-package ivy-rtags
   :straight t
   )
+(use-package lua-mode
+  :straight t
+  )
 (use-package magit
   :straight t
   )
+(use-package nyan-mode
+  :straight t
+  :config
+  (nyan-mode 1))
 (use-package polymode
   :straight t)
 (use-package poly-markdown
