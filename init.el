@@ -186,6 +186,11 @@
   :config
   (ivy-mode 1)
   )
+(use-package ivy-prescient
+  :straight t
+  :config
+  (ivy-prescient-mode)
+  )
 (use-package ivy-rich
   :straight t
   :after counsel
@@ -195,6 +200,11 @@
   )
 (use-package magit
   :straight t
+  )
+(use-package prescient
+  :straight t
+  :config
+  (prescient-persist-mode)
   )
 (use-package projectile
   :straight t
