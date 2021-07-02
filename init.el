@@ -448,6 +448,9 @@
   (lispyville-set-key-theme '(operators c-w additional
                               additional-movement slurp/barf-cp
                               prettify)))
+(use-package lorem-ipsum
+  :straight t
+  )
 (use-package lua-mode
   :straight t
   )
