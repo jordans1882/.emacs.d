@@ -125,6 +125,16 @@
 (use-package command-log-mode
   :straight t
   )
+(use-package company
+  :straight t
+  :config
+  ;;(add-to-list 'auto-mode-alist '("\\.h\\'" . company-mode))
+  ;;(add-to-list 'auto-mode-alist '("\\.hpp\\'" . company-mode))
+  ;;(add-to-list 'auto-mode-alist '("\\.cpp\\'" . company-mode))
+  )
+(use-package company-irony
+  :straight t
+  )
 (use-package conda
   :straight t
   :init
@@ -279,6 +289,13 @@
   ;; If you would like to use git-gutter.el and linum-mode
   ;;(git-gutter:linum-setup)
   )
+(use-package irony
+  :straight t
+  :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'objc-mode-hook 'irony-mode)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 (use-package ivy
   :straight t
   :config
