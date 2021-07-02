@@ -16,6 +16,7 @@
 ;; Integrate straight.el with use-package
 (straight-use-package 'use-package)
 
+(setq evil-want-keybinding nil)
 ;; Use packages with configs
 (use-package evil
    :straight t
@@ -51,10 +52,20 @@
    (define-key evil-normal-state-map " " my-second-leader-map)
    (define-key evil-visual-state-map "," my-leader-map)
    (define-key evil-visual-state-map " " my-second-leader-map)
-   (define-key evil-normal-state-map (kbd "/") 'swiper)
-   (define-key evil-normal-state-map (kbd "?") 'swiper-backward)
+   ;; (define-key evil-normal-state-map (kbd "/") 'swiper)
+   ;; (define-key evil-normal-state-map (kbd "?") 'swiper-backward)
 
    ;; Manually add in my-leader-map bindings to states
    ;; (define-key compilation-mode-map "," my-leader-map)
    ;; (define-key compilation-mode-map " " my-second-leader-map)
    )
+
+(use-package evil-collection
+  :straight t
+  :config
+  (evil-collection-init)
+  )
+
+(use-package magit
+  :straight t
+  )
