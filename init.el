@@ -180,6 +180,9 @@
   :config
   (counsel-projectile-mode)
   (setq projectile-indexing-method 'native))
+(use-package dap-mode
+  :straight t
+  )
 (use-package dashboard
   :straight t
   :config
