@@ -145,6 +145,26 @@
   (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
   ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs"))
   )
+;; (use-package corfu
+;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
+;;   ;; :bind (:map corfu-map
+;;   ;;        ("TAB" . corfu-next)
+;;   ;;        ("S-TAB" . corfu-previous))
+;; 
+;;   ;; You may want to enable Corfu only for certain modes.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
+;; 
+;;   :config
+;; 
+;;   ;; Alternatively enable Corfu globally.
+;;   ;; This is recommended if Corfu is used with dabbrev.
+;;   (corfu-global-mode)
+;; 
+;;   ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
+;;   ;; (setq corfu-cycle t)
+;; )
 (use-package counsel
   :straight t
   )
@@ -199,6 +219,9 @@
          ("M-g z" . dumb-jump-go-prefer-external-other-window))
   :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  )
+(use-package eglot
+  :straight t
   )
 (use-package elpy
   :straight t
@@ -326,6 +349,43 @@
 (use-package go-mode
   :straight t
   )
+(use-package helm
+  :straight t
+  :config
+  (require 'helm-config)
+  (setq helm-input-idle-delay                     0.01
+        helm-reuse-last-window-split-state        t
+        helm-always-two-windows                   t
+        helm-split-window-inside-p                nil
+        helm-commands-using-frame                 '(completion-at-point
+                                                    helm-apropos
+                                                    helm-eshell-prompts helm-imenu
+                                                    helm-imenu-in-all-buffers)
+        helm-actions-inherit-frame-settings       t
+        helm-use-frame-when-more-than-two-windows t
+        helm-use-frame-when-dedicated-window      t
+        helm-frame-background-color               "DarkSlateGray"
+        helm-show-action-window-other-window      'left
+        helm-allow-mouse                          t
+        helm-move-to-line-cycle-in-source         t
+        helm-autoresize-max-height                80 ; it is %.
+        helm-autoresize-min-height                20 ; it is %.
+        helm-debug-root-directory                 "/home/jordan/tmp/helm-debug"
+        helm-follow-mode-persistent               t
+        helm-candidate-number-limit               500
+        helm-visible-mark-prefix                  "✓")
+  (set-face-foreground 'helm-mark-prefix "Gold1")
+  (add-to-list 'helm-sources-using-default-as-input 'helm-source-info-bash)
+  (helm-define-key-with-subkeys global-map (kbd "C-c n") ?n 'helm-cycle-resume))
+(use-package helm-ag
+  :straight t
+  :config
+  (custom-set-variables
+ '(helm-ag-base-command "rg --no-heading")
+ `(helm-ag-success-exit-status '(0 2))))
+(use-package helm-swoop
+  :straight t
+  )
 (use-package irony
   :straight t
   :config
@@ -350,6 +410,19 @@
 (use-package ivy-rtags
   :straight t
   )
+(use-package keycast
+  :straight t
+  :config
+  ;; This works with doom-modeline, inspired by this comment:
+  ;; https://github.com/tarsius/keycast/issues/7#issuecomment-627604064
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line."
+    :global t
+    (if keycast-mode
+        (add-hook 'pre-command-hook 'keycast-mode-line-update t)
+        (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
+
+  (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: This doesn't seem to work?
 (use-package lua-mode
   :straight t
   )
