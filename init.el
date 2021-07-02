@@ -162,15 +162,216 @@
      ((member project-type '(gradle grails)) "Spec")))
 
   )
-(use-package orderless
+(use-package ob-mermaid
+  :straight t
+  :config
+  (setq ob-mermaid-cli-path "~/mermaid/node_modules/.bin/mmdc"))
+(use-package org
+  :straight t
+  :config
+  ;; Set org-mode for .org files
+  (setq auto-mode-alist (cons '("\\.org" . org-mode) auto-mode-alist))
+
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'flyspell-mode)
+
+  ;; Org file location settigns
+  (setq org-directory "~/org/")
+  (setq org-default-notes-file (concat org-directory "/todo.org"))
+
+  ;; Org-agenda settings
+  (setq org-agenda-include-all-todo t)
+  (setq org-agenda-include-diary t)
+
+  ;; Org todo keywords
+  (setq org-todo-keywords
+        '((sequence "PIPELINE"
+                    "TODO"
+                    "DONE")))
+
+  (setq org-hide-leading-stars t)
+  (setq org-odd-levels-only t)
+
+  ;; Org-babel
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . nil)
+      (shell . t)
+      (python . t)
+      (R . t)))
+
+  ;; Latex
+   (setq org-latex-pdf-process
+ 	'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+ 	"bibtex %b"
+ 	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+ 	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+        )
+
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-latex-image-default-width "")
+(setq org-latex-classes
+  '(("article"
+     "\\documentclass[11pt]{article}"
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+    ("report"
+     "\\documentclass[11pt]{report}"
+     ("\\part{%s}" . "\\part*{%s}")
+     ("\\chapter{%s}" . "\\chapter*{%s}")
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+    ("book"
+     "\\documentclass[11pt]{book}"
+     ("\\part{%s}" . "\\part*{%s}")
+     ("\\chapter{%s}" . "\\chapter*{%s}")
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+    ("beamer"
+      "\\documentclass\[presentation\]\{beamer\}"
+      ("\\section\{%s\}" . "\\section*\{%s\}")
+      ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+      ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+    ("IEEEtran"
+     "\\documentclass{IEEEtran}"
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+    ))
+
+  (setq org-latex-listings t)
+
+  ;; Org for writing a journal
+  (defvar org-journal-file "~/org/journal.org"
+     "Path to OrgMode journal file.")
+  (defvar org-journal-date-format "%Y-%m-%d"
+     "Date format string for journal headings.")
+  (defun org-journal-entry ()
+    "Create a new diary entry for today or append to an existing one."
+    (interactive)
+    (switch-to-buffer (find-file org-journal-file))
+    (widen)
+    (let ((today (format-time-string org-journal-date-format)))
+      (beginning-of-buffer)
+      (unless (org-goto-local-search-headings today nil t)
+        ((lambda ()
+           (org-insert-heading)
+           (insert today)
+           (insert "\n\n  \n"))))
+      (beginning-of-buffer)
+      (org-show-entry)
+      (org-narrow-to-subtree)
+      (end-of-buffer)
+      (backward-char 2)
+      (unless (= (current-column) 2)
+        (insert "\n\n  "))))
+
+
+  )
+(use-package ox-reveal
+  :straight t
+  :config
+  (setq org-reveal-root "file:///home/jordan/git_repos/reveal.js/"))
+;; (use-package ox-latex
+;;   :straight t
+;;   :config
+;;   (add-to-list 'org-latex-packages-alist '("" "minted"))
+;;   (setq org-latex-listings 'minted)
+;;   (setq org-latex-pdf-process
+;;       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")))
+(use-package org-ref
   :straight t
   :init
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles . (partial-completion))))))
+  (setq org-ref-completion-library 'org-ref-ivy-cite)
+  :config
+  (setq reftex-default-bibliography '("~/git_repos/phd_comps2/js_phd_comp.bib"))
+
+  ;; see org-ref for use of these variables
+  (setq org-ref-bibliography-notes "~/Dropbox/bibliography/notes.org"
+     org-ref-default-bibliography '("~/git_repos/phd_comps2/js_phd_comp.bib")
+     org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
+
+  )
+(use-package org-bullets
+  :straight t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
+(use-package org-pomodoro
+  :straight t
+  )
+(use-package org-preview-html
+  :straight t
+  )
+(use-package org-projectile
+  :straight t
+  :bind (("C-c n p" . org-projectile-project-todo-completing-read)
+         ("C-c c" . org-capture))
+  :config
+  (progn
+    (org-projectile-per-project)
+    (setq org-projectile-per-project-filepath "todo.org")
+    ;; (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files)))
+    (global-set-key (kbd "C-c c") 'org-capture)
+    (global-set-key (kbd "C-c n p") 'org-projectile-project-todo-completing-read)))
+(use-package org-roam
+      :straight t
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory (file-truename "/home/jordan/org-roam/"))
+      (org-roam-dailies-directory (file-truename "/home/jordan/org-roam-daily/"))
+      :config
+      (setq org-roam-dailies-capture-templates
+            '(("d" "default" entry
+               #'org-roam-capture--get-point
+               "* %?"
+               :file-name "org-roam-daily/%<%Y-%m-%d>"
+               :head "#+title: %<%Y-%m-%d>\n\n"
+               :olp ("Misc notes"))
+
+              ("l" "lab" entry
+                #'org-roam-capture--get-point
+                "* %?"
+                :file-name "org-roam-daily/%<%Y-%m-%d>"
+                :head "#+title: %<%Y-%m-%d>\n"
+                :olp ("Lab notes"))
+
+               ("j" "journal" entry
+                #'org-roam-capture--get-point
+                "* %?"
+                :file-name "org-roam-daily/%<%Y-%m-%d>"
+                :head "#+title: %<%Y-%m-%d>\n"
+                :olp ("Journal"))))
+
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
+;; (use-package orderless
+;;   :straight t
+;;   :init
+;;   (setq completion-styles '(orderless)
+;;         completion-category-defaults nil
+;;         completion-category-overrides '((file (styles . (partial-completion))))))
 (use-package swiper
   :straight t
   )
+;; (use-package vertico
+;;   :straight t
+;;   :init
+;;   (vertico-mode)
+;; )
 (use-package which-key
   :straight t
   :config
@@ -391,18 +592,20 @@
   (define-key my-leader-map "y" '("yas-prefix"))
   (define-key my-leader-map "yy" 'yas-insert-snippet)
   )
-(use-package vertico
-  :straight t
-  :init
-  (vertico-mode)
-)
-
-;; Personal configs and functions
 
 
-;; Define color themes switcher funs
-
-
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values '((eval hs-minor-mode t))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;; Local Variables:
 ;; mode: lisp-interaction
 ;; eval: (hs-minor-mode t)
