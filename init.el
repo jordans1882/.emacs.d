@@ -153,6 +153,18 @@
   :config
   (evil-collection-init)
   )
+
+(use-package git-messenger
+  :straight t
+  )
+(use-package git-gutter
+  :straight t
+  :config
+  (global-git-gutter-mode t)
+
+  ;; If you would like to use git-gutter.el and linum-mode
+  ;;(git-gutter:linum-setup)
+  )
 (use-package ivy
   :straight t
   :config
