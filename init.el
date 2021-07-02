@@ -782,6 +782,9 @@
   :config
   (ranger-override-dired-mode t)
   (setq ranger-cleanup-eagerly t))
+(use-package rtags
+  :straight t
+  )
 (use-package swiper
   :straight t
   )
