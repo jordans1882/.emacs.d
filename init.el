@@ -85,6 +85,13 @@
   :straight t
   :init
   (elpy-enable))
+(use-package ess
+  :straight t
+  :config
+  (setq ess-use-flymake nil) ;; disable Flymake
+  (add-hook 'ess-mode-hook '(lambda () (define-key ess-mode-map (kbd "M-<RET>") 'ess-eval-region-or-line-visibly-and-step)))
+  (add-hook 'ess-mode-hook '(lambda () (define-key ess-mode-map (kbd "C-S-<RET>") 'ess-eval-region-or-function-or-paragraph-and-step)))
+  )
 (use-package emacs
   :config
     ;; Appearance
@@ -201,6 +208,14 @@
 (use-package magit
   :straight t
   )
+(use-package polymode
+  :straight t)
+(use-package poly-markdown
+  :straight t)
+(use-package poly-R
+  :straight t)
+(use-package poly-org
+  :straight t)
 (use-package prescient
   :straight t
   :config

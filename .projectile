@@ -1,8 +1,9 @@
 .saves/
-straight/
-transient/
-projectile.cache
-projectile-bookmarks.eld
 auto-save-list/
 org-roam.db
+projectile.cache
+projectile-bookmarks.eld
 recentf
+straight/
+transient/
+var/
