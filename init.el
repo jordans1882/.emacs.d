@@ -1,3 +1,5 @@
+;; Misenplace:
+;; My emacs config
 
 ;; Bootstrap straight.el
 (defvar bootstrap-version)
@@ -16,8 +18,9 @@
 ;; Integrate straight.el with use-package
 (straight-use-package 'use-package)
 
-(setq evil-want-keybinding nil)
+
 ;; Use packages with configs
+(setq evil-want-keybinding nil)
 (use-package evil
    :straight t
    :config
@@ -59,13 +62,16 @@
    ;; (define-key compilation-mode-map "," my-leader-map)
    ;; (define-key compilation-mode-map " " my-second-leader-map)
    )
-
 (use-package evil-collection
   :straight t
   :config
   (evil-collection-init)
   )
-
 (use-package magit
   :straight t
   )
+
+;; Local Variables:
+;; mode: lisp-interaction
+;; eval: (hs-minor-mode t)
+;; End:
