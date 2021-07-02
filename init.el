@@ -131,6 +131,10 @@
 (use-package counsel
   :straight t
   )
+(use-package counsel-org-clock
+  :straight t
+  :after counsel-projectile
+)
 (use-package counsel-projectile
   :straight t
   :config
@@ -464,6 +468,7 @@
      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
 
   )
+
 (use-package org-bullets
   :straight t
   :config
