@@ -22,6 +22,9 @@
 ;; Use packages with configs
 (setq evil-want-keybinding nil)
 
+(use-package counsel
+  :straight t
+  )
 (use-package doom-modeline
       :straight t
       :hook (after-init . doom-modeline-mode))
@@ -78,8 +81,8 @@
    (define-key evil-normal-state-map " " my-second-leader-map)
    (define-key evil-visual-state-map "," my-leader-map)
    (define-key evil-visual-state-map " " my-second-leader-map)
-   ;; (define-key evil-normal-state-map (kbd "/") 'swiper)
-   ;; (define-key evil-normal-state-map (kbd "?") 'swiper-backward)
+   (define-key evil-normal-state-map (kbd "/") 'swiper)
+   (define-key evil-normal-state-map (kbd "?") 'swiper-backward)
 
    ;; Manually add in my-leader-map bindings to states
    ;; (define-key compilation-mode-map "," my-leader-map)
@@ -107,6 +110,9 @@
   (setq completion-styles '(orderless)
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
+(use-package swiper
+  :straight t
+  )
 (use-package which-key
   :straight t
   :config
