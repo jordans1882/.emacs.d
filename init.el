@@ -875,6 +875,12 @@
   :straight t
   :after treemacs magit
   )
+(use-package tree-sitter
+  :straight t
+  )
+(use-package tree-sitter-langs
+  :straight t
+  )
 (use-package which-key
   :straight t
   :config
