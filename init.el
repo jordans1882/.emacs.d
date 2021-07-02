@@ -116,6 +116,12 @@
     		    (cheatsheet-show-group x))))
 
   )
+(use-package cider
+  :straight t
+  )
+(use-package clojure-mode
+  :straight t
+  )
 (use-package conda
   :straight t
   :init
