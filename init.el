@@ -333,6 +333,9 @@
 (use-package evil-nerd-commenter
   :straight t
   )
+(use-package fill-column-indicator
+  :straight t
+  )
 (use-package flycheck
   :straight t
   :config
