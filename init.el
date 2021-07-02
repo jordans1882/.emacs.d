@@ -299,6 +299,19 @@
   :config
   (evil-collection-init)
   )
+(use-package flycheck
+  :straight t
+  :config
+  (global-flycheck-mode t)
+
+  ;; Enable for other modes
+  (add-hook 'c++-mode-hook 'flycheck-mode)
+  (add-hook 'web-mode-hook 'flycheck-mode)
+  (add-hook 'json-mode-hook 'flycheck-mode)
+)
+(use-package flycheck-clojure
+  :straight t
+  )
 (use-package git-messenger
   :straight t
   )
