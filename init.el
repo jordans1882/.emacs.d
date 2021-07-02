@@ -508,44 +508,6 @@
   :straight t
   :config
   (nyan-mode 1))
-(use-package paredit
-  :straight t
-  )
-(use-package polymode
-  :straight t)
-(use-package poly-markdown
-  :straight t)
-(use-package poly-R
-  :straight t)
-(use-package poly-org
-  :straight t)
-(use-package prescient
-  :straight t
-  :config
-  (prescient-persist-mode)
-  )
-(use-package projectile
-  :straight t
-  :config
-  (projectile-mode)
-  (setq projectile-completion-system 'ivy)
-  (defun projectile-test-suffix (project-type)
-    "Find default test files suffix based on PROJECT-TYPE."
-    (cond
-     ((member project-type '(rails-rspec ruby-rspec)) "_spec")
-     ((member project-type '(rails-test ruby-test lein-test go)) "_test")
-     ((member project-type '(r)) "_test")
-     ((member project-type '(scons)) "test")
-     ((member project-type '(maven symfony)) "Test")
-     ((member project-type '(gradle grails)) "Spec")))
-
-  )
-(use-package pyvenv
-  :straight t
-  )
-(use-package python-pytest
-  :straight t
-  )
 (use-package ob-mermaid
   :straight t
   :config
@@ -749,6 +711,69 @@
 ;;   (setq completion-styles '(orderless)
 ;;         completion-category-defaults nil
 ;;         completion-category-overrides '((file (styles . (partial-completion))))))
+(use-package paredit
+  :straight t
+  )
+(use-package pdf-tools
+  :straight t
+  :config
+  (evil-make-overriding-map pdf-view-mode-map 'normal)
+  (evil-define-key 'normal pdf-view-mode-map
+  "h" 'image-backward-hscroll
+  "j" (lambda () (interactive) (pdf-view-next-line-or-next-page 5))
+  "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
+  "l" 'image-forward-hscroll
+  "G" 'pdf-view-last-page)
+  (define-key doc-view-mode-map (kbd "j") 'doc-view-next-line-or-next-page)
+  (define-key doc-view-mode-map (kbd "k") 'doc-view-previous-line-or-previous-page)
+  (define-key doc-view-mode-map (kbd "h") 'image-backward-hscroll)
+  (define-key doc-view-mode-map (kbd "l") 'image-forward-hscroll)
+  (define-key doc-view-mode-map (kbd "gg") 'doc-view-first-page)
+  (define-key doc-view-mode-map (kbd "G") 'doc-view-last-page)
+  (define-key doc-view-mode-map (kbd "C-w C-w") 'evil-window-next)
+  (define-key doc-view-mode-map (kbd "C-w C-w") 'evil-window-next)
+  (define-key doc-view-mode-map (kbd "-") 'doc-view-shrink)
+  (define-key doc-view-mode-map (kbd "+") 'doc-view-enlarge)
+  ;; (define-key doc-view-mode-map "," my-leader-map)
+  (define-key doc-view-mode-map "M-h" 'evil-window-left)
+  (define-key doc-view-mode-map "M-l" 'evil-window-right)
+  (define-key doc-view-mode-map "M-j" 'evil-window-down)
+  (define-key doc-view-mode-map "M-k" 'evil-window-up))
+(use-package polymode
+  :straight t)
+(use-package poly-markdown
+  :straight t)
+(use-package poly-R
+  :straight t)
+(use-package poly-org
+  :straight t)
+(use-package prescient
+  :straight t
+  :config
+  (prescient-persist-mode)
+  )
+(use-package projectile
+  :straight t
+  :config
+  (projectile-mode)
+  (setq projectile-completion-system 'ivy)
+  (defun projectile-test-suffix (project-type)
+    "Find default test files suffix based on PROJECT-TYPE."
+    (cond
+     ((member project-type '(rails-rspec ruby-rspec)) "_spec")
+     ((member project-type '(rails-test ruby-test lein-test go)) "_test")
+     ((member project-type '(r)) "_test")
+     ((member project-type '(scons)) "test")
+     ((member project-type '(maven symfony)) "Test")
+     ((member project-type '(gradle grails)) "Spec")))
+
+  )
+(use-package pyvenv
+  :straight t
+  )
+(use-package python-pytest
+  :straight t
+  )
 (use-package ranger
   :straight t
   :config
