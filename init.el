@@ -46,6 +46,13 @@
   :config
   (counsel-projectile-mode)
   (setq projectile-indexing-method 'native))
+(use-package dashboard
+  :straight t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png"))
 (use-package doom-modeline
       :straight t
       :hook (after-init . doom-modeline-mode))
