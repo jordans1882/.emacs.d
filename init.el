@@ -774,6 +774,9 @@
 (use-package python-pytest
   :straight t
   )
+(use-package rainbow-delimiters
+  :straight t
+  )
 (use-package ranger
   :straight t
   :config
