@@ -122,6 +122,9 @@
 (use-package clojure-mode
   :straight t
   )
+(use-package command-log-mode
+  :straight t
+  )
 (use-package conda
   :straight t
   :init
