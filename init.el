@@ -33,10 +33,12 @@
   )
 (use-package all-the-icons-ivy-rich
   :straight t
+  :after counsel
   :init (all-the-icons-ivy-rich-mode 1))
 (use-package ivy-rich
   :straight t
-  :init (ivy-rich-mode 1))
+  :after counsel
+  :config (ivy-rich-mode 1))
 (use-package counsel
   :straight t
   )
