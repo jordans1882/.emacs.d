@@ -1105,6 +1105,13 @@
   :straight t
   :config
   (add-hook 'prog-mode-hook #'ws-butler-mode))
+(use-package yasnippet
+  :straight t
+  :config
+  (yas-global-mode 1)
+  ;;(setq yas-snippet-dirs '("~/git_repos/misenplace-snippets"))
+    )
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
