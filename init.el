@@ -437,6 +437,17 @@
         (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
   (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: This doesn't seem to work?
+(use-package lispy
+  :straight t
+  :hook ((emacs-lisp-mode . lispy-mode)
+         (scheme-mode . lispy-mode)))
+(use-package lispyville
+  :straight t
+  :hook ((lispy-mode . lispyville-mode))
+  :config
+  (lispyville-set-key-theme '(operators c-w additional
+                              additional-movement slurp/barf-cp
+                              prettify)))
 (use-package lua-mode
   :straight t
   )
