@@ -42,6 +42,80 @@
   :straight t
   :config
   (auctex-latexmk-setup))
+(use-package cheatsheet
+  :straight t
+  :config
+  (cheatsheet-add-group 'Common
+			'(:key "C-g" :description "Escape out of current command")
+			'(:key "C-x C-c" :description "leave Emacs")
+			'(:key "C-n" :description "Next line")
+			'(:key "C-p" :description "Previous line"))
+
+  (cheatsheet-add-group 'MiseEnPlace-term
+			'(:key "M-h" :description "Move left a buffer")
+			'(:key "M-l" :description "Move right a buffer")
+			'(:key "M-j" :description "Move down a buffer")
+			'(:key "M-k" :description "Move down a buffer")
+			'(:key "M-s" :description "Split buffer below")
+			'(:key "M-v" :description "Split buffer to right")
+			'(:key "M-d" :description "Delete current window")
+			'(:key "," :description "Global Leader key"))
+
+  (cheatsheet-add-group 'Vim
+			'(:key ":q" :description "Quit")
+			'(:key ":wq" :description "Write and quit")
+			'(:key "Esc" :description "Drop back into normal mode")
+			'(:key "i" :description "Drop into insert mode")
+			'(:key ":" :description "Jump into menu")
+			'(:key "h" :description "Move cursor left")
+			'(:key "j" :description "Move cursor down")
+			'(:key "k" :description "Move cursor up")
+			'(:key "l" :description "Move cursor right")
+			'(:key "C-u" :description "Move up half screen")
+			'(:key "C-d" :description "Move down half screen")
+			'(:key "w" :description "Move forward word")
+			'(:key "b" :description "Move forward word")
+			'(:key "ciw" :description "Change inner word")
+			'(:key "ci(" :description "Change inside parens")
+			'(:key "dd" :description "Delete current line")
+			'(:key "c0" :description "Change from cursor to beginning of line")
+			'(:key "cw" :description "Change from cursor to end of word"))
+  (cheatsheet-add-group 'Tmux
+			'(:key "C-a c" :description "New screen")
+                        '(:key "C-a n" :description "Next screen"))
+
+  (defun cheatsheet-group-get (grp)
+    "Get cheatsheet as list of group structs, keeping defining order."
+    (list (list :name grp :cheats (cheatsheet--get-group grp))))
+
+
+  (defun cheatsheet--format-group-list (grp)
+    "Print the whole cheatsheet."
+    (let* ((cheatsheet (cheatsheet-group-get grp))
+           (formatted-groups (mapcar 'cheatsheet--format-group cheatsheet))
+           (formatted-cheatsheet (apply 'concat formatted-groups)))
+      formatted-cheatsheet))
+
+  (defun cheatsheet-show-group (group)
+    "Create buffer and show cheatsheet."
+    (interactive)
+    (switch-to-buffer-other-window "*cheatsheet*")
+    (setq buffer-read-only nil)
+    (cheatsheet-mode)
+    (erase-buffer)
+    (insert (cheatsheet--format-group-list group))
+    (setq buffer-read-only t)
+    )
+
+  (defun counsel-cheatsheets ()
+    "Forward to `describe-function'."
+    (interactive)
+    (ivy-read "Cheatsheats: "
+    	  (cheatsheet--cheat-groups)
+    	  :action (lambda (x)
+    		    (cheatsheet-show-group x))))
+
+  )
 (use-package conda
   :straight t
   :init
