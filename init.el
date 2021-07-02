@@ -488,10 +488,29 @@
 (use-package magit
   :straight t
   )
+;; (use-package mpc
+;;   :straight t
+;;   )
+;; (use-package mu4e
+;;   :straight t
+;;   :config
+;; 
+;;   (setq mu4e-change-filenames-when-moving t)
+;;   (setq mu4e-update-interval (* 10 60))
+;;   (setq mu4e-get-mail-command "mbsync -a")
+;;   (setq mu4e-maildir "~/Mail")
+;;   (setq mu4e-drafts-folder "/[Gmail].Drafts")
+;;   (setq mu4e-sent-folder "/[Gmail].Drafts")
+;;   (setq mu4e-refile-folder "/[Gmail].All Mail")
+;;   (setq mu4e-trash-folder "/[Gmail].Trash")
+;;   )
 (use-package nyan-mode
   :straight t
   :config
   (nyan-mode 1))
+(use-package paredit
+  :straight t
+  )
 (use-package polymode
   :straight t)
 (use-package poly-markdown
