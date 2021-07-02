@@ -785,6 +785,9 @@
 (use-package rtags
   :straight t
   )
+(use-package skeletor
+  :straight t
+  )
 (use-package swiper
   :straight t
   )
