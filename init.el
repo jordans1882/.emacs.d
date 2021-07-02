@@ -35,10 +35,9 @@
   :straight t
   :after counsel
   :init (all-the-icons-ivy-rich-mode 1))
-(use-package ivy-rich
+(use-package ace-jump-mode
   :straight t
-  :after counsel
-  :config (ivy-rich-mode 1))
+  )
 (use-package counsel
   :straight t
   )
@@ -159,6 +158,10 @@
   :config
   (ivy-mode 1)
   )
+(use-package ivy-rich
+  :straight t
+  :after counsel
+  :config (ivy-rich-mode 1))
 (use-package ivy-rtags
   :straight t
   )
