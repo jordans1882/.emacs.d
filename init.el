@@ -204,6 +204,9 @@
   :straight t
   :init
   (elpy-enable))
+(use-package ein
+  :straight t
+  )
 (use-package ess
   :straight t
   :config
@@ -516,7 +519,6 @@
      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
 
   )
-
 (use-package org-bullets
   :straight t
   :config
