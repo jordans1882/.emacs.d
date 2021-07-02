@@ -223,6 +223,9 @@
 (use-package eglot
   :straight t
   )
+(use-package egg-timer
+  :straight t
+  )
 (use-package elpy
   :straight t
   :init
