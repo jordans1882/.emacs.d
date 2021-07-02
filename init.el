@@ -420,6 +420,11 @@
 ;;   (setq completion-styles '(orderless)
 ;;         completion-category-defaults nil
 ;;         completion-category-overrides '((file (styles . (partial-completion))))))
+(use-package ranger
+  :straight t
+  :config
+  (ranger-override-dired-mode t)
+  (setq ranger-cleanup-eagerly t))
 (use-package swiper
   :straight t
   )
