@@ -20,6 +20,23 @@
 
 ;; Use packages with configs
 
+(use-package alert
+  :straight t
+  :commands (alert)
+  :init
+  (setq alert-default-style 'notifier))
+(use-package alarm-clock
+  :straight t
+  )
+(use-package all-the-icons
+  :straight t
+  )
+(use-package all-the-icons-ivy-rich
+  :straight t
+  :init (all-the-icons-ivy-rich-mode 1))
+(use-package ivy-rich
+  :straight t
+  :init (ivy-rich-mode 1))
 (use-package counsel
   :straight t
   )
