@@ -788,6 +788,9 @@
 (use-package skeletor
   :straight t
   )
+(use-package sublimity
+  :straight t
+  ) ;; TODO: This doesn't work?
 (use-package swiper
   :straight t
   )
