@@ -643,7 +643,8 @@
   )
 (use-package org-projectile
   :straight t
-  :bind (("C-c n p" . org-projectile-project-todo-completing-read)
+  :bind (
+	 ;; ("C-c n p" . org-projectile-project-todo-completing-read)
          ("C-c c" . org-capture))
   :config
   (progn
