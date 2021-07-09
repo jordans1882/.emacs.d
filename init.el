@@ -258,41 +258,40 @@
   )
 (use-package emacs
   :config
-    ;; Appearance
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (set-frame-parameter (selected-frame) 'alpha '(95 50))
-    (add-to-list 'default-frame-alist '(alpha 95 50))
-    (tool-bar-mode -1)
+  ;; Appearance
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (set-frame-parameter (selected-frame) 'alpha '(95 50))
+  (add-to-list 'default-frame-alist '(alpha 95 50))
+  (tool-bar-mode -1)
 
-    (setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
+  (setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
 
-    ;; Utility funs
-    (defun dawn ()
-	"Set theme to day"
-	(interactive)
-	(counsel-load-theme-action "doom-gruvbox-light"))
-    (defun day ()
-	"Set theme to day"
-	(interactive)
-	(counsel-load-theme-action "doom-solarized-light"))
-    (defun sunny ()
-	"Set theme to day"
-	(interactive)
-	(counsel-load-theme-action "doom-nord-light"))
-    (defun dusk ()
-	"Set theme to dusk"
-	(interactive)
-	(counsel-load-theme-action "doom-nova"))
-    (defun evening ()
-	"Set theme to evening"
-	(interactive)
-	(counsel-load-theme-action "doom-gruvbox"))
-    (defun late-night ()
-	"Set theme to night"
-	(interactive)
-	(counsel-load-theme-action "doom-Iosvkem"))
-  )
+  ;; Utility funs
+  (defun dawn ()
+    "Set theme to day"
+    (interactive)
+    (counsel-load-theme-action "doom-gruvbox-light"))
+  (defun day ()
+    "Set theme to day"
+    (interactive)
+    (counsel-load-theme-action "doom-solarized-light"))
+  (defun sunny ()
+    "Set theme to day"
+    (interactive)
+    (counsel-load-theme-action "doom-nord-light"))
+  (defun dusk ()
+    "Set theme to dusk"
+    (interactive)
+    (counsel-load-theme-action "doom-nova"))
+  (defun evening ()
+    "Set theme to evening"
+    (interactive)
+    (counsel-load-theme-action "doom-gruvbox"))
+  (defun late-night ()
+    "Set theme to night"
+    (interactive)
+    (counsel-load-theme-action "doom-Iosvkem")))
 (use-package evil
    :straight t
    :init
@@ -365,6 +364,171 @@
 (use-package flycheck-clojure
   :straight t
   )
+(use-package general
+  :straight t
+  :after (:all which-key hydra)
+  :config
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(global-map evil-normal-state-map)
+     "C-=" 'text-scale-increase
+     "C--" 'text-scale-decrease
+     "M-C-j" 'evil-window-decrease-height
+     "M-C-k" 'evil-window-increase-height
+     "M-C-h" 'evil-window-decrease-width
+     "M-C-l" 'evil-window-increase-width
+     "M-h" 'evil-window-left
+     "M-l" 'evil-window-right
+     "M-j" 'evil-window-down
+     "M-k" 'evil-window-up
+     "M-S-j" 'evil-rotate-upwards
+     "M-S-k" 'evil-rotate-downwards
+     "M-<tab>" 'tab-bar-switch-to-next-tab
+     "M-S-c" 'evil-window-delete
+     "M-q" 'evil-window-delete
+     )
+
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(lisp-interaction-mode-map)
+     "C-=" 'text-scale-increase
+     "C--" 'text-scale-decrease
+     "M-C-j" 'evil-window-decrease-height
+     "M-C-k" 'evil-window-increase-height
+     "M-C-h" 'evil-window-decrease-width
+     "M-C-l" 'evil-window-increase-width
+     "M-h" 'evil-window-left
+     "M-l" 'evil-window-right
+     "M-j" 'evil-window-down
+     "M-k" 'evil-window-up
+     "M-S-j" 'evil-rotate-upwards
+     "M-S-k" 'evil-rotate-downwards
+     "M-<tab>" 'tab-bar-switch-to-next-tab
+     "M-S-c" 'evil-window-delete
+     "M-q" 'evil-window-delete)
+
+
+
+
+(define-key lisp-interaction-mode-map (kbd "<C-return>") 'eval-defun)
+(define-key lisp-interaction-mode-map (kbd "M-<RET>") 'eval-defun)
+
+
+
+  (general-create-definer misenplace/leader-keys
+			  :keymaps '(normal insert visual emacs)
+			  :prefix ","
+			  :global-prefix "C-,"
+			  )
+  (misenplace/leader-keys
+   ;; Agenda
+   "a" '(:ignore t :which-key "agenda")
+   "aa" '(org-agenda :which-key "agenda")
+   "as" '(org-schedule :which-key "schedule")
+   "an" '(org-projectile-capture-for-current-project :which-key "capture project")
+   "ac" '(:ignore t :which-key "clock")
+   "acc" '(counsel-org-clock-goto :which-key "clock goto")
+   "aci" '(org-clock-in :which-key "clock in")
+   "aco" '(org-clock-out :which-key "clock out")
+   "ach" '(counsel-org-clock-history :which-key "clock history")
+   "ag" '(:ignore t :which-key "goto")
+   "agp" '(org-projectile-goto-location-for-project :which-key "project org")
+   "at" '(org-todo :which-key "todo")
+   "ap" '(org-todo :which-key "pomodoro")
+
+   ;; Buffers
+   "b" '(:ignore t :which-key "buffers")
+   "bb" '(switch-to-buffer :which-key "find")
+   "bc" '(evil-buffer-new :which-key "create")
+   "bl" '(next-buffer :which-key "next")
+   "bp" '(previous-buffer :which-key "previous")
+   "bn" '(evil-next-buffer :which-key "next")
+   "bp" '(evil-previous-buffer :which-key "previous")
+   "bd" '(evil-delete-buffer :which-key "delete")
+   "br" '(rename-buffer :which-key "rename")
+
+   ;; Dumb-jump
+   "d" '(:ignore t :which-key "dumb-jump")
+   "dd" '(dumb-jump-go :which-key "go")
+   "db" '(dumb-jump-back :which-key "back")
+   "do" '(dumb-jump-go-other-window :which-key "go other")
+   "dq" '(dumb-jump-quick-look :which-key "quick-look")
+
+   ;; Errors
+   "e" '(:ignore t :which-key "errors")
+   "ee" '(flycheck-list-errors :which-key "goto")
+   "e/" '(counsel-flycheck :which-key "counsel")
+   "ej" '(flycheck-next-error :which-key "next")
+   "en" '(flycheck-next-error :which-key "next")
+   "ek" '(flycheck-previous-error :which-key "previous")
+   "ep" '(flycheck-previous-error :which-key "previous")
+
+   ;; Files
+   "f" '(:ignore t :which-key "files")
+   "ff" '(treemacs :which-key "menu")
+   "fc" '(treemacs-create-file :which-key "create file")
+   "fC" '(treemacs-create-dir :which-key "create dir")
+   "fd" '(treemacs-delete :which-key "delete")
+   "fe" '(:ignore t :which-key "edit")
+   "fea" '(edit-awesomerc :which-key "awesomerc")
+   "feb" '(edit-bashrc :which-key "bashrc")
+   "fee" '(edit-config :which-key "emacsrc")
+   "feq" '(edit-qutebrowser :which-key "qutebrowserrc")
+   "fer" '(reload-config :which-key "reload emacs")
+   "fev" '(edit-vimrc :which-key "vimrc")
+   "fey" '(edit-yas-config :which-key "yasrc")
+   "fq" '(treemacs-quit :which-key "quit")
+   "fs" '(treemacs-visit-node-horizontal-split :which-key "split")
+   "fv" '(treemacs-visit-node-vertical-split :which-key "vsplit")
+
+   ;; Git
+   "g" '(:ignore t :which-key "git")
+   "gb" '(magit-branch :which-key "branch-switch")
+   "gB" '(magit-branch-create :which-key "branch-create")
+   "gc" '(magit-commit :which-key "commit")
+   "gj" '(git-gutter:next-diff :which-key "next-diff")
+   "gg" '(magit-status :which-key "status")
+   "gk" '(git-gutter:previous-diff :which-key "previous-diff")
+   "gl" '(magit-log :which-key "log")
+   "gn" '(git-gutter:next-diff :which-key "next-diff")
+   "gp" '(git-gutter:previous-diff :which-key "previous-diff")
+   "gs" '(git-gutter:stage-hunk :which-key "stage hunk")
+   "gS" '(magit-stage :which-key "stage")
+   "gU" '(magit-unstage :which-key "unstage")
+   "g<" '(magit-pull :which-key "pull")
+   "g>" '(magit-push :which-key "push")
+
+
+   "x" '(:ignore t :which-key "edit")
+   "xs" '(hydra-text-scale/body :which-key "scale text")
+   "xc" '(evilnc-comment-or-uncomment-lines :which-key "toggle comment")
+
+
+   "z" '(:ignore t :which-key "folds")
+   "zz" '(origami-toggle-node :which-key "toggle fold")
+   "za" '(origami-toggle-node :which-key "toggle fold")
+   "zj" '(origami-next-fold :which-key "next fold")
+   "zk" '(origami-previous-fold :which-key "previous fold")
+   "zn" '(origami-next-fold :which-key "next fold")
+   "zp" '(origami-previous-fold :which-key "previous fold")
+   "zr" '(origami-open-all-nodes :which-key "open all folds")
+   "zm" '(origami-close-all-nodes :which-key "close all folds")
+ ;;  "n" '(:ignore t :which-key "n-test")
+ ;;  "nt" '(counsel-load-theme :which-key "choose theme")
+
+  ;; (which-key-add-key-based-replacements ",g" "git")
+  ;; (which-key-add-key-based-replacements ",h" "help")
+  ;; (which-key-add-key-based-replacements ",j" "jump")
+  ;; (which-key-add-key-based-replacements ",p" "projects")
+  ;; (which-key-add-key-based-replacements ",o" "org")
+  ;; (which-key-add-key-based-replacements ",r" "R")
+  ;; (which-key-add-key-based-replacements ",t" "tabs")
+  ;; (which-key-add-key-based-replacements ",x" "edit")
+  ;; (which-key-add-key-based-replacements ",w" "windows")
+  ;; (which-key-add-key-based-replacements ",y" "yas")
+
+   )
+  )
 (use-package git-messenger
   :straight t
   )
@@ -415,6 +579,18 @@
  `(helm-ag-success-exit-status '(0 2))))
 (use-package helm-swoop
   :straight t
+  )
+(use-package hydra
+  :straight t
+  :config
+  (defhydra hydra-text-scale (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "in")
+    ("k" text-scale-decrease "out")
+    ("q" nil "quit" :exit t))
+
+  ;; (misenplace/leader-keys
+  ;;   "xs" '(hydra-text-scale/body :which-key "scale text"))
   )
 (use-package irony
   :straight t
@@ -721,6 +897,9 @@
 ;;   (setq completion-styles '(orderless)
 ;;         completion-category-defaults nil
 ;;         completion-category-overrides '((file (styles . (partial-completion))))))
+(use-package origami
+  :straight t
+  )
 (use-package paredit
   :straight t
   )
@@ -919,84 +1098,84 @@
   (define-key my-second-leader-map "c" '("comment-prefix"))
   (define-key my-second-leader-map "cc" 'evilnc-comment-or-uncomment-lines)
 
-  ;; binding ",a" for agenda (todo manager)
-  (define-key my-leader-map "a" '("agenda-prefix"))
-  (define-key my-leader-map "aa" 'org-agenda)
-  (define-key my-leader-map "as" 'org-schedule)
-  (define-key my-leader-map "an" 'org-projectile-capture-for-current-project)
-  (define-key my-leader-map "acc" 'counsel-org-clock-goto)
-  (define-key my-leader-map "aci" 'org-clock-in)
-  (define-key my-leader-map "ach" 'counsel-org-clock-history)
-  (define-key my-leader-map "aco" 'org-clock-out)
-  (define-key my-leader-map "agp" 'org-projectile-goto-location-for-project)
-  (define-key my-leader-map "at" 'org-todo)
-  (define-key my-leader-map "ap" 'org-pomodoro)
+  ;; ;; binding ",a" for agenda (todo manager)
+  ;; (define-key my-leader-map "a" '("agenda-prefix"))
+  ;; (define-key my-leader-map "aa" 'org-agenda)
+  ;; (define-key my-leader-map "as" 'org-schedule)
+  ;; (define-key my-leader-map "an" 'org-projectile-capture-for-current-project)
+  ;; (define-key my-leader-map "acc" 'counsel-org-clock-goto)
+  ;; (define-key my-leader-map "aci" 'org-clock-in)
+  ;; (define-key my-leader-map "ach" 'counsel-org-clock-history)
+  ;; (define-key my-leader-map "aco" 'org-clock-out)
+  ;; (define-key my-leader-map "agp" 'org-projectile-goto-location-for-project)
+  ;; (define-key my-leader-map "at" 'org-todo)
+  ;; (define-key my-leader-map "ap" 'org-pomodoro)
 
-  ;; binding ",b" for buffers
-  (define-key my-leader-map "b" '("buffer-prefix"))
-  (define-key my-leader-map "bb" 'switch-to-buffer)
-  (define-key my-leader-map "bl" 'next-buffer)
-  (define-key my-leader-map "bh" 'previous-buffer)
-  (define-key my-leader-map "bc" 'evil-buffer-new)
-  (define-key my-leader-map "bn" 'evil-next-buffer)
-  (define-key my-leader-map "bp" 'evil-prev-buffer)
-  (define-key my-leader-map "bd" 'evil-delete-buffer)
-  (define-key my-leader-map "br" 'rename-buffer)
+  ;; ;; binding ",b" for buffers
+  ;; (define-key my-leader-map "b" '("buffer-prefix"))
+  ;; (define-key my-leader-map "bb" 'switch-to-buffer)
+  ;; (define-key my-leader-map "bl" 'next-buffer)
+  ;; (define-key my-leader-map "bh" 'previous-buffer)
+  ;; (define-key my-leader-map "bc" 'evil-buffer-new)
+  ;; (define-key my-leader-map "bn" 'evil-next-buffer)
+  ;; (define-key my-leader-map "bp" 'evil-prev-buffer)
+  ;; (define-key my-leader-map "bd" 'evil-delete-buffer)
+  ;; (define-key my-leader-map "br" 'rename-buffer)
 
-  ;; binding ",c" for nerd commenter
-  (define-key my-leader-map "c" '("comment-prefix"))
-  (define-key my-leader-map "cc" 'evilnc-comment-or-uncomment-lines)
+  ;; ;; binding ",c" for nerd commenter
+  ;; (define-key my-leader-map "c" '("comment-prefix"))
+  ;; (define-key my-leader-map "cc" 'evilnc-comment-or-uncomment-lines)
 
-  ;; binding ",d" for dumb-jump
-  (define-key my-leader-map "d" '("dumb-jump-prefix"))
-  (define-key my-leader-map "dd" 'dumb-jump-go)
-  (define-key my-leader-map "db" 'dumb-jump-back)
-  (define-key my-leader-map "do" 'dumb-jump-go-other-window)
-  (define-key my-leader-map "dp" 'dumb-jump-go-prompt)
-  (define-key my-leader-map "dq" 'dumb-jump-quick-look)
+  ;; ;; binding ",d" for dumb-jump
+  ;; (define-key my-leader-map "d" '("dumb-jump-prefix"))
+  ;; (define-key my-leader-map "dd" 'dumb-jump-go)
+  ;; (define-key my-leader-map "db" 'dumb-jump-back)
+  ;; (define-key my-leader-map "do" 'dumb-jump-go-other-window)
+  ;; (define-key my-leader-map "dp" 'dumb-jump-go-prompt)
+  ;; (define-key my-leader-map "dq" 'dumb-jump-quick-look)
 
-  ;; binding ",e" for error (flycheck)
-  (define-key my-leader-map "e" '("evilnc-prefix"))
-  (define-key my-leader-map "ee" 'flycheck-list-errors)
-  (define-key my-leader-map "e/" 'counsel-flycheck)
-  (define-key my-leader-map "ej" 'flycheck-next-error)
-  (define-key my-leader-map "ek" 'flycheck-previous-error)
-  (define-key my-leader-map "en" 'flycheck-next-error)
-  (define-key my-leader-map "ep" 'flycheck-previous-error)
+  ;; ;; binding ",e" for error (flycheck)
+  ;; (define-key my-leader-map "e" '("evilnc-prefix"))
+  ;; (define-key my-leader-map "ee" 'flycheck-list-errors)
+  ;; (define-key my-leader-map "e/" 'counsel-flycheck)
+  ;; (define-key my-leader-map "ej" 'flycheck-next-error)
+  ;; (define-key my-leader-map "ek" 'flycheck-previous-error)
+  ;; (define-key my-leader-map "en" 'flycheck-next-error)
+  ;; (define-key my-leader-map "ep" 'flycheck-previous-error)
 
-  ;; binding " f" for files
-  (define-key my-leader-map "f" '("files-prefix"))
-  (define-key my-leader-map "ff" 'treemacs)
-  (define-key my-leader-map "fc" 'treemacs-create-file)
-  (define-key my-leader-map "fC" 'treemacs-create-dir)
-  (define-key my-leader-map "fd" 'treemacs-delete)
-  (define-key my-leader-map "feb" 'edit-bashrc)
-  (define-key my-leader-map "fea" 'edit-awesomerc)
-  (define-key my-leader-map "fee" 'edit-config)
-  (define-key my-leader-map "feq" 'edit-qutebrowser)
-  (define-key my-leader-map "fer" 'reload-config)
-  (define-key my-leader-map "fev" 'edit-vimrc)
-  (define-key my-leader-map "fey" 'edit-yas-config)
-  (define-key my-leader-map "fq" 'treemacs-quit)
-  (define-key my-leader-map "fs" 'treemacs-visit-node-horizontal-split)
-  (define-key my-leader-map "fv" 'treemacs-visit-node-vertical-split)
+  ;; ;; binding " f" for files
+  ;; (define-key my-leader-map "f" '("files-prefix"))
+  ;; (define-key my-leader-map "ff" 'treemacs)
+  ;; (define-key my-leader-map "fc" 'treemacs-create-file)
+  ;; (define-key my-leader-map "fC" 'treemacs-create-dir)
+  ;; (define-key my-leader-map "fd" 'treemacs-delete)
+  ;; (define-key my-leader-map "feb" 'edit-bashrc)
+  ;; (define-key my-leader-map "fea" 'edit-awesomerc)
+  ;; (define-key my-leader-map "fee" 'edit-config)
+  ;; (define-key my-leader-map "feq" 'edit-qutebrowser)
+  ;; (define-key my-leader-map "fer" 'reload-config)
+  ;; (define-key my-leader-map "fev" 'edit-vimrc)
+  ;; (define-key my-leader-map "fey" 'edit-yas-config)
+  ;; (define-key my-leader-map "fq" 'treemacs-quit)
+  ;; (define-key my-leader-map "fs" 'treemacs-visit-node-horizontal-split)
+  ;; (define-key my-leader-map "fv" 'treemacs-visit-node-vertical-split)
 
-  ;; binding ",g" for git
-  (define-key my-leader-map "g" '("git-prefix"))
-  (define-key my-leader-map "gb" 'magit-branch)
-  (define-key my-leader-map "gB" 'magit-branch-create)
-  (define-key my-leader-map "gc" 'magit-commit)
-  (define-key my-leader-map "gg" 'magit-status)
-  (define-key my-leader-map "gl" 'magit-log)
-  (define-key my-leader-map "gs" 'git-gutter:stage-hunk)
-  (define-key my-leader-map "gS" 'magit-stage)
-  (define-key my-leader-map "gU" 'magit-unstage)
-  (define-key my-leader-map "gj" 'git-gutter:next-diff)
-  (define-key my-leader-map "gk" 'git-gutter:previous-diff)
-  (define-key my-leader-map "gn" 'git-gutter:next-diff)
-  (define-key my-leader-map "gp" 'git-gutter:previous-diff)
-  (define-key my-leader-map "g>" 'magit-pull)
-  (define-key my-leader-map "g<" 'magit-push)
+  ;; ;; binding ",g" for git
+  ;; (define-key my-leader-map "g" '("git-prefix"))
+  ;; (define-key my-leader-map "gb" 'magit-branch)
+  ;; (define-key my-leader-map "gB" 'magit-branch-create)
+  ;; (define-key my-leader-map "gc" 'magit-commit)
+  ;; (define-key my-leader-map "gg" 'magit-status)
+  ;; (define-key my-leader-map "gl" 'magit-log)
+  ;; (define-key my-leader-map "gs" 'git-gutter:stage-hunk)
+  ;; (define-key my-leader-map "gS" 'magit-stage)
+  ;; (define-key my-leader-map "gU" 'magit-unstage)
+  ;; (define-key my-leader-map "gj" 'git-gutter:next-diff)
+  ;; (define-key my-leader-map "gk" 'git-gutter:previous-diff)
+  ;; (define-key my-leader-map "gn" 'git-gutter:next-diff)
+  ;; (define-key my-leader-map "gp" 'git-gutter:previous-diff)
+  ;; (define-key my-leader-map "g>" 'magit-pull)
+  ;; (define-key my-leader-map "g<" 'magit-push)
 
   ;; binding ",h" for help
   (define-key my-leader-map "h" '("help-prefix"))
@@ -1109,10 +1288,10 @@
   (define-key my-leader-map "w=" 'balance-windows)
 
   ;; binding ",x" for edit commands
-  (define-key my-leader-map "x" '("edit-prefix"))
-  (define-key my-leader-map "xc" 'evilnc-comment-or-uncomment-lines)
-  (define-key my-leader-map "xi" 'text-scale-increase)
-  (define-key my-leader-map "xd" 'text-scale-decrease)
+  ;; (define-key my-leader-map "x" '("edit-prefix"))
+  ;; (define-key my-leader-map "xc" 'evilnc-comment-or-uncomment-lines)
+  ;; (define-key my-leader-map "xi" 'text-scale-increase)
+  ;; (define-key my-leader-map "xd" 'text-scale-decrease)
 
   ;; binding ",y" for yasnippets
   (define-key my-leader-map "y" '("yas-prefix"))
