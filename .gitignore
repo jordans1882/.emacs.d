@@ -3,7 +3,9 @@ auto-save-list/
 org-roam.db
 projectile-bookmarks.eld
 projectile.cache
-recentf
+recentf*
 straight/
 transient/
 var/
+.cache/
+elpy/
