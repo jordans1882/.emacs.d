@@ -389,6 +389,9 @@
      "M-<tab>" 'tab-bar-switch-to-next-tab
      "M-S-c" 'evil-window-delete
      "M-q" 'evil-window-delete
+     "C-q" 'evil-delete-buffer
+     "C-Q" 'evil-quit
+     "ESC ESC ESC" 'evil-normal-state
      )
 
 
@@ -396,6 +399,7 @@
   (general-define-key
      :states '(normal visual)
      :keymaps '(global-map evil-normal-state-map)
+     "q" 'keyboard-escape-quit
      "zj" 'origami-next-fold
      "zk" 'origami-previous-fold
      "zn" 'origami-next-fold
