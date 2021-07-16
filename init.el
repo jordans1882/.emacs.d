@@ -368,8 +368,11 @@
   :straight t
   :after (:all which-key hydra)
   :config
+  ;; (general-evil-setup t)
+
+  ;; Define evil-globals
   (general-define-key
-     :states '(normal visual)
+     :states '(normal visual insert)
      :keymaps '(global-map evil-normal-state-map)
      "C-=" 'text-scale-increase
      "C--" 'text-scale-decrease
@@ -388,35 +391,34 @@
      "M-q" 'evil-window-delete
      )
 
+
+  ;; Define evil normals and visuals
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(global-map evil-normal-state-map)
+     "zj" 'origami-next-fold
+     "zk" 'origami-previous-fold
+     "zn" 'origami-next-fold
+     "zp" 'origami-previous-fold
+     )
+
+
+  ;; Define lisp interaction modes
   (general-define-key
      :states '(normal visual)
      :keymaps '(lisp-interaction-mode-map)
-     "C-=" 'text-scale-increase
-     "C--" 'text-scale-decrease
-     "M-C-j" 'evil-window-decrease-height
-     "M-C-k" 'evil-window-increase-height
-     "M-C-h" 'evil-window-decrease-width
-     "M-C-l" 'evil-window-increase-width
-     "M-h" 'evil-window-left
-     "M-l" 'evil-window-right
-     "M-j" 'evil-window-down
-     "M-k" 'evil-window-up
-     "M-S-j" 'evil-rotate-upwards
-     "M-S-k" 'evil-rotate-downwards
-     "M-<tab>" 'tab-bar-switch-to-next-tab
-     "M-S-c" 'evil-window-delete
-     "M-q" 'evil-window-delete)
+     "M-<RET>" 'eval-defun)
+
+  ;; Define python modes
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(python-mode-map)
+     "M-<RET>" 'elpy-shell-send-statement-and-step)
 
 
-
-
-(define-key lisp-interaction-mode-map (kbd "<C-return>") 'eval-defun)
-(define-key lisp-interaction-mode-map (kbd "M-<RET>") 'eval-defun)
-
-
-
+  ;; Define Leader
   (general-create-definer misenplace/leader-keys
-			  :keymaps '(normal insert visual emacs)
+			  :states '(normal insert visual emacs)
 			  :prefix ","
 			  :global-prefix "C-,"
 			  )
@@ -629,10 +631,10 @@
         (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
   (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: This doesn't seem to work?
-(use-package lispy
-  :straight t
-  :hook ((emacs-lisp-mode . lispy-mode)
-         (scheme-mode . lispy-mode)))
+;; (use-package lispy
+;;   :straight t
+;;   :hook ((emacs-lisp-mode . lispy-mode)
+;;          (scheme-mode . lispy-mode)))
 (use-package lispyville
   :straight t
   :hook ((lispy-mode . lispyville-mode))
@@ -900,9 +902,9 @@
 (use-package origami
   :straight t
   )
-(use-package paredit
-  :straight t
-  )
+;; (use-package paredit
+;;   :straight t
+;;   )
 (use-package pdf-tools
   :straight t
   :config
