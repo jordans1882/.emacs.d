@@ -23,6 +23,11 @@
 (use-package ace-jump-mode
   :straight t
   )
+(use-package ace-window
+  :straight t
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  )
 (use-package alert
   :straight t
   :commands (alert)
@@ -291,7 +296,10 @@
   (defun late-night ()
     "Set theme to night"
     (interactive)
-    (counsel-load-theme-action "doom-Iosvkem")))
+    (counsel-load-theme-action "doom-Iosvkem"))
+
+
+  )
 (use-package evil
    :straight t
    :init
@@ -440,7 +448,8 @@
 
    ;; Buffers
    "b" '(:ignore t :which-key "buffers")
-   "bb" '(switch-to-buffer :which-key "find")
+   "bb" '(persp-counsel-switch-buffer :which-key "find")
+   "bB" '(switch-to-buffer :which-key "Find")
    "bc" '(evil-buffer-new :which-key "create")
    "bl" '(next-buffer :which-key "next")
    "bp" '(previous-buffer :which-key "previous")
@@ -499,6 +508,65 @@
    "gU" '(magit-unstage :which-key "unstage")
    "g<" '(magit-pull :which-key "pull")
    "g>" '(magit-push :which-key "push")
+
+   ;; Help
+   "h" '(:ignore t :which-key "help")
+   "hc" '(counsel-cheatsheets :which-key "cheatsheets")
+   "hm" '(describe-mode :which-key "mode")
+   "hf" '(describe-function :which-key "function")
+   "hv" '(describe-variable :which-key "variable")
+
+
+   ;; Jump
+   "j" '(:ignore t :which-key "jump")
+   "jb" '(counsel-cheatsheets :which-key "back")
+   "jd" '(dumb-jump-go :which-key "definition")
+   "jt" '(projectile-find-tag :which-key "tag")
+   "jj" '(evil-ace-jump-char-mode :which-key "jump")
+   "jw" '(evil-ace-jump-word-mode :which-key "word")
+   "jl" '(evil-ace-jump-line-mode :which-key "line")
+
+   ;; Org
+   "o" '(:ignore t :which-key "org")
+   "oc" '(:ignore t :which-key "capture/clock")
+   "occ" '(org-capture :which-key "capture")
+   "oci" '(org-clock-in :which-key "clock-in")
+   "oco" '(org-clock-out :which-key "clock-out")
+   "or" '(:ignore t :which-key "roam")
+   "orc" '(org-roam-capture :which-key "capture")
+   "orc" '(org-roam-find-file :which-key "find-file")
+   "ord" '(:ignore t :which-key "dailies")
+   "ordc" '(org-roam-dailies-capture-today :which-key "capture")
+   "ordf" '(org-roam-dailies-find-today :which-key "find")
+
+   ;; Windows
+   "w" '(:ignore t :which-key "window")
+   "wd" '(evil-window-delete :which-key "delete")
+   "wD" '(ace-delete-window :which-key "Delete")
+   "wh" '(evil-window-left :which-key "left")
+   "wn" '(evil-window-new :which-key "new")
+   "wj" '(evil-window-down :which-key "down")
+   "wk" '(evil-window-up :which-key "up")
+   "wl" '(evil-window-right :which-key "right")
+   "wm" '(maximize-window :which-key "maximize")
+   "wM" '(minimize-window :which-key "minimize")
+   ;; "wp" '(:ignore t :which-key "perspective")
+   "wp" '(persp-switch :which-key "switch")
+   "wu" '(winner-undo :which-key "winner-undo")
+   "wv" '(evil-window-vsplit :which-key "vsplit")
+   "wr" '(winner-redo :which-key "winner-redo")
+   "ws" '(evil-window-split :which-key "split")
+   "wS" '(ace-swap-window :which-key "swap")
+   "ww" '(ace-window :which-key "window")
+   "w-" '(evil-window-split :which-key "split")
+   "w|" '(evil-window-vsplit :which-key "vsplit")
+   "w|" '(balance-windows :which-key "balance")
+
+  ;; Make into a hydra
+  ;;  (define-key my-leader-map "wJ" 'evil-window-decrease-height)
+  ;;  (define-key my-leader-map "wK" 'evil-window-increase-height)
+  ;;  (define-key my-leader-map "wH" 'evil-window-decrease-width)
+  ;;  (define-key my-leader-map "wL" 'evil-window-increase-width)
 
 
    "x" '(:ignore t :which-key "edit")
@@ -905,6 +973,11 @@
 ;; (use-package paredit
 ;;   :straight t
 ;;   )
+(use-package perspective
+  :straight t
+  :init
+  (persp-mode)
+  )
 (use-package pdf-tools
   :straight t
   :config
@@ -1179,32 +1252,32 @@
   ;; (define-key my-leader-map "g>" 'magit-pull)
   ;; (define-key my-leader-map "g<" 'magit-push)
 
-  ;; binding ",h" for help
-  (define-key my-leader-map "h" '("help-prefix"))
-  (define-key my-leader-map "hm" 'describe-mode)
-  (define-key my-leader-map "hf" 'describe-function)
-  (define-key my-leader-map "hv" 'describe-variable)
-  (define-key my-leader-map "hc" 'counsel-cheatsheets)
+  ;; ;; binding ",h" for help
+  ;; (define-key my-leader-map "h" '("help-prefix"))
+  ;; (define-key my-leader-map "hm" 'describe-mode)
+  ;; (define-key my-leader-map "hf" 'describe-function)
+  ;; (define-key my-leader-map "hv" 'describe-variable)
+  ;; (define-key my-leader-map "hc" 'counsel-cheatsheets)
 
-  ;; binding ",j" for jump
-  (define-key my-leader-map "j" '("jump-prefix"))
-  (define-key my-leader-map "jb" 'dumb-jump-back)
-  (define-key my-leader-map "jd" 'dumb-jump-go)
-  (define-key my-leader-map "jt" 'projectile-find-tag)
-  (define-key my-leader-map "jj" 'evil-ace-jump-char-mode)
-  (define-key my-leader-map "jw" 'evil-ace-jump-word-mode)
-  (define-key my-leader-map "jl" 'evil-ace-jump-line-mode)
+  ;; ;; binding ",j" for jump
+  ;; (define-key my-leader-map "j" '("jump-prefix"))
+  ;; (define-key my-leader-map "jb" 'dumb-jump-back)
+  ;; (define-key my-leader-map "jd" 'dumb-jump-go)
+  ;; (define-key my-leader-map "jt" 'projectile-find-tag)
+  ;; (define-key my-leader-map "jj" 'evil-ace-jump-char-mode)
+  ;; (define-key my-leader-map "jw" 'evil-ace-jump-word-mode)
+  ;; (define-key my-leader-map "jl" 'evil-ace-jump-line-mode)
 
 
-  ;; binding ",o" for org
-  (define-key my-leader-map "o" '("org-prefix"))
-  (define-key my-leader-map "occ" 'org-capture)
-  (define-key my-leader-map "orc" 'org-roam-capture)
-  (define-key my-leader-map "orf" 'org-roam-find-file)
-  (define-key my-leader-map "ordc" 'org-roam-dailies-capture-today)
-  (define-key my-leader-map "ordf" 'org-roam-dailies-find-today)
-  (define-key my-leader-map "oci" 'org-clock-in)
-  (define-key my-leader-map "oco" 'org-clock-out)
+  ;; ;; binding ",o" for org
+  ;; (define-key my-leader-map "o" '("org-prefix"))
+  ;; (define-key my-leader-map "occ" 'org-capture)
+  ;; (define-key my-leader-map "orc" 'org-roam-capture)
+  ;; (define-key my-leader-map "orf" 'org-roam-find-file)
+  ;; (define-key my-leader-map "ordc" 'org-roam-dailies-capture-today)
+  ;; (define-key my-leader-map "ordf" 'org-roam-dailies-find-today)
+  ;; (define-key my-leader-map "oci" 'org-clock-in)
+  ;; (define-key my-leader-map "oco" 'org-clock-out)
 
   ;; binding ",p" for projects
   (define-key my-leader-map "p" '("projects-prefix"))
@@ -1269,25 +1342,25 @@
   (which-key-add-key-based-replacements ",y" "yas")
 
   ;; binding ",w" for windows
-  (define-key my-leader-map "wd" 'evil-window-delete)
-  (define-key my-leader-map "wh" 'evil-window-left)
-  (define-key my-leader-map "wn" 'evil-window-new)
-  (define-key my-leader-map "wj" 'evil-window-down)
-  (define-key my-leader-map "wk" 'evil-window-up)
-  (define-key my-leader-map "wl" 'evil-window-right)
-  (define-key my-leader-map "wm" 'maximize-window)
-  (define-key my-leader-map "wM" 'minimize-window)
-  (define-key my-leader-map "wu" 'winner-undo)
-  (define-key my-leader-map "wv" 'evil-window-vsplit)
-  (define-key my-leader-map "wr" 'winner-redo)
-  (define-key my-leader-map "ws" 'evil-window-split)
-  (define-key my-leader-map "wJ" 'evil-window-decrease-height)
-  (define-key my-leader-map "wK" 'evil-window-increase-height)
-  (define-key my-leader-map "wH" 'evil-window-decrease-width)
-  (define-key my-leader-map "wL" 'evil-window-increase-width)
-  (define-key my-leader-map "w-" 'evil-window-split)
-  (define-key my-leader-map "w|" 'evil-window-vsplit)
-  (define-key my-leader-map "w=" 'balance-windows)
+  ;; (define-key my-leader-map "wd" 'evil-window-delete)
+  ;; (define-key my-leader-map "wh" 'evil-window-left)
+  ;; (define-key my-leader-map "wn" 'evil-window-new)
+  ;; (define-key my-leader-map "wj" 'evil-window-down)
+  ;; (define-key my-leader-map "wk" 'evil-window-up)
+  ;; (define-key my-leader-map "wl" 'evil-window-right)
+  ;; (define-key my-leader-map "wm" 'maximize-window)
+  ;; (define-key my-leader-map "wM" 'minimize-window)
+  ;; (define-key my-leader-map "wu" 'winner-undo)
+  ;; (define-key my-leader-map "wv" 'evil-window-vsplit)
+  ;; (define-key my-leader-map "wr" 'winner-redo)
+  ;; (define-key my-leader-map "ws" 'evil-window-split)
+  ;; (define-key my-leader-map "wJ" 'evil-window-decrease-height)
+  ;; (define-key my-leader-map "wK" 'evil-window-increase-height)
+  ;; (define-key my-leader-map "wH" 'evil-window-decrease-width)
+  ;; (define-key my-leader-map "wL" 'evil-window-increase-width)
+  ;; (define-key my-leader-map "w-" 'evil-window-split)
+  ;; (define-key my-leader-map "w|" 'evil-window-vsplit)
+  ;; (define-key my-leader-map "w=" 'balance-windows)
 
   ;; binding ",x" for edit commands
   ;; (define-key my-leader-map "x" '("edit-prefix"))
@@ -1299,6 +1372,10 @@
   (define-key my-leader-map "y" '("yas-prefix"))
   (define-key my-leader-map "yy" 'yas-insert-snippet)
   )
+(use-package winner
+  :straight t
+  :config
+  (winner-mode))
 (use-package ws-butler
   :straight t
   :config
