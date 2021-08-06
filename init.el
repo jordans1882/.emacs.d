@@ -938,8 +938,8 @@
       :hook
       (after-init . org-roam-mode)
       :custom
-      (org-roam-directory (file-truename "/home/jordan/org-roam/"))
-      (org-roam-dailies-directory (file-truename "/home/jordan/org-roam-daily/"))
+      (org-roam-directory (concat org-directory "/org-roam/"))
+      (org-roam-dailies-directory (concat org-directory "/org-roam-daily/"))
       :config
       (setq org-roam-dailies-capture-templates
             '(("d" "default" entry
