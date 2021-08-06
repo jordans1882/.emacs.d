@@ -918,6 +918,8 @@
   )
 (use-package org-projectile
   :straight t
+  :preface
+      (setq org-roam-v2-ack t)
   :bind (
 	 ;; ("C-c n p" . org-projectile-project-todo-completing-read)
          ("C-c c" . org-capture))
