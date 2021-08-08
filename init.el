@@ -200,6 +200,9 @@
   :config
   (counsel-projectile-mode)
   (setq projectile-indexing-method 'native))
+(use-package csharp-mode
+  :straight t
+  )
 (use-package dap-mode
   :straight t
   )
@@ -398,8 +401,7 @@
      "M-C-j" 'evil-window-decrease-height
      "M-C-k" 'evil-window-increase-height
      "M-C-h" 'evil-window-decrease-width
-     "M-C-l" 'evil-window-increase-width
-     "M-h" 'evil-window-left
+     "M-C-l" 'evil-ndow-left
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
@@ -408,7 +410,8 @@
      "M-v" 'evil-window-vsplit
      "M-S-j" 'evil-rotate-upwards
      "M-S-k" 'evil-rotate-downwards
-     "M-<tab>" 'tab-bar-switch-to-next-tab
+     "M-<tab>" 'tab-window-increase-width
+     "M-C-r" 'restart-emacs
      "M-S-c" 'evil-window-delete
      "M-q" 'evil-window-delete
      "C-q" 'evil-delete-buffer
@@ -763,6 +766,15 @@
 (use-package magit
   :straight t
   )
+(use-package magit-todos
+  :straight t
+  )
+(use-package magithub
+  :straight t
+  :after magit
+  :config
+  (magithub-feature-autoinject t)
+  (setq magithub-clone-default-directory "~/git_repos"))
 ;; (use-package mpc
 ;;   :straight t
 ;;   )
@@ -1068,6 +1080,9 @@
   :config
   (ranger-override-dired-mode t)
   (setq ranger-cleanup-eagerly t))
+(use-package restart-emacs
+  :straight t
+  )
 (use-package rtags
   :straight t
   )
@@ -1085,6 +1100,11 @@
 ;;   :init
 ;;   (vertico-mode)
 ;; )
+(use-package theme-magic
+  :straight t
+  :config
+  (theme-magic-export-theme-mode)
+  )
 (use-package treemacs
   :straight t
   :defer t
@@ -1411,6 +1431,13 @@
   :straight t
   :config
   (setq inferior-lisp-program "sbcl"))
+(use-package stan-mode
+  :straight t
+  )
+
+(use-package visual-regexp-steroids
+  :straight t
+  )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
