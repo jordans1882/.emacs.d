@@ -403,6 +403,9 @@
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
+     "M-d" 'evil-window-delete
+     "M-s" 'evil-window-split
+     "M-v" 'evil-window-vsplit
      "M-S-j" 'evil-rotate-upwards
      "M-S-k" 'evil-rotate-downwards
      "M-<tab>" 'tab-bar-switch-to-next-tab
