@@ -401,10 +401,11 @@
      "M-C-j" 'evil-window-decrease-height
      "M-C-k" 'evil-window-increase-height
      "M-C-h" 'evil-window-decrease-width
-     "M-C-l" 'evil-ndow-left
+     "M-C-l" 'evil-window-increase-width
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
+     "M-h" 'evil-window-left
      "M-d" 'evil-window-delete
      "M-s" 'evil-window-split
      "M-v" 'evil-window-vsplit
