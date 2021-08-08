@@ -47,6 +47,11 @@
   :straight t
   :config
   (auctex-latexmk-setup))
+(use-package beacon
+  :straight t
+  :config
+  (beacon-mode 1)
+  )
 (use-package cheatsheet
   :straight t
   :config
@@ -205,6 +210,12 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png"))
+(use-package deft
+  :straight t
+  :config
+  (require 'deft)
+  (setq deft-directory "~/org")
+  )
 (use-package dockerfile-mode
   :straight t
   )
@@ -532,6 +543,7 @@
 
    ;; Org
    "o" '(:ignore t :which-key "org")
+   "od" '(deft :which-key "deft")
    "oc" '(:ignore t :which-key "capture/clock")
    "occ" '(org-capture :which-key "capture")
    "oci" '(org-clock-in :which-key "clock-in")
@@ -935,8 +947,8 @@
       :hook
       (after-init . org-roam-mode)
       :custom
-      (org-roam-directory (file-truename "/home/jordan/org-roam/"))
-      (org-roam-dailies-directory (file-truename "/home/jordan/org-roam-daily/"))
+      (org-roam-directory (file-truename "~/org/org-roam/"))
+      (org-roam-dailies-directory (file-truename "~/org/org-roam-daily/"))
       :config
       (setq org-roam-dailies-capture-templates
             '(("d" "default" entry
