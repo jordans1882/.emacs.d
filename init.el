@@ -535,9 +535,10 @@
    "h" '(:ignore t :which-key "help")
    "hc" '(counsel-cheatsheets :which-key "cheatsheets")
    "hm" '(describe-mode :which-key "mode")
-   "hf" '(describe-function :which-key "function")
-   "hv" '(describe-variable :which-key "variable")
-
+   "hk" '(describe-key :which-key "key")
+   "hf" '(counsel-describe-function :which-key "function")
+   "hv" '(counsel-describe-variable :which-key "variable")
+   "hs" '(counsel-describe-symbol :which-key "symbol")
 
    ;; Jump
    "j" '(:ignore t :which-key "jump")
@@ -742,6 +743,20 @@
 (use-package lua-mode
   :straight t
   )
+(use-package lsp-latex
+  :straight t
+  :config
+  (with-eval-after-load "tex-mode"
+    (add-hook 'tex-mode-hook 'lsp)
+    (add-hook 'latex-mode-hook 'lsp))
+  ;; For YaTeX
+  (with-eval-after-load "yatex"
+    (add-hook 'yatex-mode-hook 'lsp))
+
+  ;; For bibtex
+  (with-eval-after-load "bibtex"
+    (add-hook 'bibtex-mode-hook 'lsp))
+)
 (use-package lsp-ivy
   :straight t
   :commands
@@ -770,12 +785,12 @@
 (use-package magit-todos
   :straight t
   )
-(use-package magithub
-  :straight t
-  :after magit
-  :config
-  (magithub-feature-autoinject t)
-  (setq magithub-clone-default-directory "~/git_repos"))
+;; (use-package magithub
+;;   :straight t
+;;   :after magit
+;;   :config
+;;   (magithub-feature-autoinject t)
+;;   (setq magithub-clone-default-directory "~/git_repos"))
 ;; (use-package mpc
 ;;   :straight t
 ;;   )

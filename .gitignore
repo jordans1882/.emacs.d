@@ -11,3 +11,4 @@ var/
 .cask/
 elpy/
 elpa/
+.lsp-session-v1
