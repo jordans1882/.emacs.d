@@ -12,3 +12,4 @@ var/
 elpy/
 elpa/
 .lsp-session-v1
+forge-database.sqlite

@@ -8,3 +8,8 @@ straight/
 transient/
 var/
 elpy/
+.cask
+elpa
+.lsp-session-v1
+recentf
+forge-database.sqlite
