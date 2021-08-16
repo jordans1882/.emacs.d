@@ -311,8 +311,28 @@
     "Set theme to night"
     (interactive)
     (counsel-load-theme-action "doom-Iosvkem"))
-
-
+  (defun set-target-buffer (buffer)
+    "Switch to BUFFER.
+  BUFFER may be a string or nil."
+    (setq target-buffer buffer))
+  (defun ivy-set-process-target ()
+    "Switch to another buffer."
+    (interactive)
+    (ivy-read "Switch to buffer: " #'internal-complete-buffer
+              :keymap ivy-switch-buffer-map
+              :preselect (buffer-name (other-buffer (current-buffer)))
+              :action #'set-target-buffer
+              :matcher #'ivy--switch-buffer-matcher
+              :caller 'ivy-switch-buffer))
+  (defun send-line-to-target-process ()
+    "Send a line to process defined by target-buffer."
+    (interactive)
+    (setq proc (get-process target-buffer))
+    (setq com (concat (buffer-substring (point-at-bol) (point-at-eol)) "\n"))
+    (process-send-string target-buffer com)
+    (next-line)
+    )
+  (global-set-key (kbd "M-SPC") (lambda () (interactive) (send-line-to-target-process)))
   )
 (use-package evil
    :straight t
