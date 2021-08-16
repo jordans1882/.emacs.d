@@ -8,4 +8,6 @@ straight/
 transient/
 var/
 .cache/
+.cask/
 elpy/
+elpa/
