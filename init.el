@@ -264,7 +264,9 @@
 (use-package elpy
   :straight t
   :init
-  (elpy-enable))
+  (elpy-enable)
+  (setq elpy-rpc-python-command "python3")
+  )
 (use-package ein
   :straight t
   )
@@ -1092,6 +1094,10 @@
   )
 (use-package pyvenv
   :straight t
+  :config
+    (setenv "home" (expand-file-name "~/anaconda3/envs"))
+    (pyvenv-mode 1)
+    (pyvenv-activate "base")
   )
 (use-package python-pytest
   :straight t
