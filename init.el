@@ -315,6 +315,31 @@
     (counsel-load-theme-action "doom-Iosvkem"))
 
 
+  ;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Project Templates ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Python Project Template
+   (defun make-python-project ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (setq python-template-repo "git@github.com:jordans1882/template-python.git")
+     (setq proj-name (read-string "Enter your project name:"))
+     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+     ;; TODO: Add check if project already exists for make-python-project
+     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
+     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+     (shell-command-to-string clone-command)
+     (shell-command-to-string rm-git-command)
+     (magit-init proj-dir) ;; use hub for this?
+     (projectile-add-known-project proj-dir)
+     ;; TODO: Add project to treemacs known workspaces for make-python-project
+     ;; (treemacs-add-project-to-workspace projectdir projectname)
+     )
+
+
+
+
   )
 (use-package evil
    :straight t
@@ -388,7 +413,6 @@
 (use-package flycheck-clojure
   :straight t
   )
-
 (use-package forge
   :straight t
   )
@@ -569,6 +593,45 @@
    "ordc" '(org-roam-dailies-capture-today :which-key "capture")
    "ordf" '(org-roam-dailies-find-today :which-key "find")
 
+
+   "p" '(:ignore t :which-key "projects")
+   "pA" '(projectile-add-known-project :which-key "add")
+   "pa" '(counsel-projectile-org-agenda :which-key "agenda")
+   "pc" '(counsel-projectile-org-capture :which-key "capture")
+   "pd" '(counsel-projectile-find-dir :which-key "directory")
+   "pm" '(projectile-compile-project :which-key "compile")
+   "pp" '(projectile-persp-switch-project :which-key "switch")
+   "pf" '(counsel-projectile-find-file :which-key "file")
+   "pq" '(projectile-kill-buffers :which-key "quit")
+   "pr" '(counsel-projectile-rg :which-key "ripgrep")
+   "ps" '(projectile-run-shell :which-key "shell")
+   "pt" '(:ignore t :which-key "test")
+   "ptt" '(projectile-test-project :which-key "test all")
+   "ptt" '(projectile-find-test-file :which-key "file")
+   "pT" '(:ignore t :which-key "tags")
+   "pTT" '(projectile-find-tag :which-key "find")
+   "pTr" '(projectile-tag-regenerate :which-key "regenerate")
+   ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
+   ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
+
+
+
+   ;; TODO: change tab bindings to be like window bindings in awesome
+   ;; Tabs
+   "t" '(:ignore t :which-key "todos")
+   "tt" '(ivy-magit-todos :which-key "todos")
+   ;; "<TAB><TAB>" '(tab-bar-select-tab-by-name :which-key "tabs")
+   ;; (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
+   ;; (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
+   ;; (define-key my-leader-map "tc" 'tab-bar-new-tab)
+   ;; (define-key my-leader-map "td" 'tab-bar-close-tab)
+   ;; (define-key my-leader-map "tl" 'tab-bar-switch-to-next-tab)
+   ;; (define-key my-leader-map "th" 'tab-bar-switch-to-prev-tab)
+   ;; (define-key my-leader-map "tr" 'tab-bar-rename-tab)
+   ;; (define-key my-leader-map "tL" 'tab-bar-move-tab)
+
+
+
    ;; Windows
    "w" '(:ignore t :which-key "window")
    "wd" '(evil-window-delete :which-key "delete")
@@ -622,7 +685,7 @@
   ;; (which-key-add-key-based-replacements ",p" "projects")
   ;; (which-key-add-key-based-replacements ",o" "org")
   ;; (which-key-add-key-based-replacements ",r" "R")
-  ;; (which-key-add-key-based-replacements ",t" "tabs")
+  ;; (whica-key-add-key-based-replacements ",t" "tabs")
   ;; (which-key-add-key-based-replacements ",x" "edit")
   ;; (which-key-add-key-based-replacements ",w" "windows")
   ;; (which-key-add-key-based-replacements ",y" "yas")
@@ -646,7 +709,11 @@
 (use-package ghub
   :straight t
   )
-
+(use-package hl-todo
+  :straight t
+  :config
+  (global-hl-todo-mode t)
+)
 (use-package helm
   :straight t
   :config
@@ -732,7 +799,7 @@
         (add-hook 'pre-command-hook 'keycast-mode-line-update t)
         (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
-  (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: This doesn't seem to work?
+  (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: Figure out why keycast package doesn't work
 ;; (use-package lispy
 ;;   :straight t
 ;;   :hook ((emacs-lisp-mode . lispy-mode)
@@ -963,6 +1030,9 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   )
+(use-package org-noter
+  :straight t
+  )
 (use-package org-pomodoro
   :straight t
   )
@@ -1020,6 +1090,20 @@
               :map org-mode-map
               (("C-c n i" . org-roam-insert))
               (("C-c n I" . org-roam-insert-immediate))))
+(use-package org-roam-bibtex
+  :straight t
+  )
+(use-package org-roam-server
+  :straight t
+  )
+(use-package org-sidebar
+  :straight t
+  )
+(use-package org-super-agenda
+  :straight t
+  )
+(use-package org-transclusion
+  :straight (:host github :repo "nobiot/org-transclusion"))
 ;; (use-package orderless
 ;;   :straight t
 ;;   :init
@@ -1036,6 +1120,9 @@
   :straight t
   :init
   (persp-mode)
+  )
+(use-package persp-projectile
+  :straight t
   )
 (use-package pdf-tools
   :straight t
@@ -1105,6 +1192,9 @@
 (use-package rainbow-delimiters
   :straight t
   )
+(use-package rainbow-mode
+  :straight t
+  )
 (use-package ranger
   :straight t
   :config
@@ -1121,7 +1211,7 @@
   )
 (use-package sublimity
   :straight t
-  ) ;; TODO: This doesn't work?
+  ) ;; TODO: Figure out why sublimity package doesn't work.
 (use-package swiper
   :straight t
   )
@@ -1212,6 +1302,11 @@
 (use-package treemacs-projectile
   :straight t
   :after treemacs projectile
+  )
+(use-package treemacs-perspective
+  :straight t
+  :config
+  (treemacs-set-scope-type 'Perspectives)
   )
 (use-package treemacs-magit
   :straight t
@@ -1351,23 +1446,23 @@
   ;; (define-key my-leader-map "oco" 'org-clock-out)
 
   ;; binding ",p" for projects
-  (define-key my-leader-map "p" '("projects-prefix"))
-  (define-key my-leader-map "pA" 'projectile-add-known-project)
-  (define-key my-leader-map "pa" 'counsel-projectile-org-agenda)
-  (define-key my-leader-map "pc" 'counsel-projectile-org-capture)
-  (define-key my-leader-map "pd" 'counsel-projectile-find-dir)
-  (define-key my-leader-map "pm" 'projectile-compile-project)
-  (define-key my-leader-map "pp" 'counsel-projectile-switch-project)
-  (define-key my-leader-map "pf" 'counsel-projectile-find-file)
-  (define-key my-leader-map "pq" 'projectile-kill-buffers)
-  (define-key my-leader-map "pr" 'counsel-projectile-rg)
-  (define-key my-leader-map "ps" 'projectile-run-shell)
-  (define-key my-leader-map "ptt" 'projectile-find-tag)
-  (define-key my-leader-map "ptr" 'projectile-tag-regenerate)
-  (define-key my-leader-map "ptT" 'projectile-test-project)
-  (define-key my-leader-map "ptf" 'projectile-find-test-file)
-  (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
-  (define-key my-leader-map "p]" 'projectile-next-project-buffer)
+  ;; (define-key my-leader-map "p" '("projects-prefix"))
+  ;; (define-key my-leader-map "pA" 'projectile-add-known-project)
+  ;; (define-key my-leader-map "pa" 'counsel-projectile-org-agenda)
+  ;; (define-key my-leader-map "pc" 'counsel-projectile-org-capture)
+  ;; (define-key my-leader-map "pd" 'counsel-projectile-find-dir)
+  ;; (define-key my-leader-map "pm" 'projectile-compile-project)
+  ;; (define-key my-leader-map "pp" 'counsel-projectile-switch-project)
+  ;; (define-key my-leader-map "pf" 'counsel-projectile-find-file)
+  ;; (define-key my-leader-map "pq" 'projectile-kill-buffers)
+  ;; (define-key my-leader-map "pr" 'counsel-projectile-rg)
+  ;; (define-key my-leader-map "ps" 'projectile-run-shell)
+  ;; (define-key my-leader-map "ptt" 'projectile-find-tag)
+  ;; (define-key my-leader-map "ptr" 'projectile-tag-regenerate)
+  ;; (define-key my-leader-map "ptT" 'projectile-test-project)
+  ;; (define-key my-leader-map "ptf" 'projectile-find-test-file)
+  ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
+  ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
 
   ;; binding ",r" for R programming language
   (define-key my-leader-map "rpb" 'ess-r-devtools-build)
@@ -1387,14 +1482,14 @@
   (define-key my-leader-map "rq" 'ess-watch-quit)
 
   ;; binding ",t" for tabs
-  (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
-  (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
-  (define-key my-leader-map "tc" 'tab-bar-new-tab)
-  (define-key my-leader-map "td" 'tab-bar-close-tab)
-  (define-key my-leader-map "tl" 'tab-bar-switch-to-next-tab)
-  (define-key my-leader-map "th" 'tab-bar-switch-to-prev-tab)
-  (define-key my-leader-map "tr" 'tab-bar-rename-tab)
-  (define-key my-leader-map "tL" 'tab-bar-move-tab)
+  ;; (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
+  ;; (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
+  ;; (define-key my-leader-map "tc" 'tab-bar-new-tab)
+  ;; (define-key my-leader-map "td" 'tab-bar-close-tab)
+  ;; (define-key my-leader-map "tl" 'tab-bar-switch-to-next-tab)
+  ;; (define-key my-leader-map "th" 'tab-bar-switch-to-prev-tab)
+  ;; (define-key my-leader-map "tr" 'tab-bar-rename-tab)
+  ;; (define-key my-leader-map "tL" 'tab-bar-move-tab)
 
   (which-key-add-key-based-replacements ",a" "agenda")
   (which-key-add-key-based-replacements ",b" "buffers")
@@ -1407,7 +1502,7 @@
   (which-key-add-key-based-replacements ",p" "projects")
   (which-key-add-key-based-replacements ",o" "org")
   (which-key-add-key-based-replacements ",r" "R")
-  (which-key-add-key-based-replacements ",t" "tabs")
+  ;; (which-key-add-key-based-replacements ",t" "tabs")
   (which-key-add-key-based-replacements ",x" "edit")
   (which-key-add-key-based-replacements ",w" "windows")
   (which-key-add-key-based-replacements ",y" "yas")
@@ -1464,11 +1559,9 @@
 (use-package stan-mode
   :straight t
   )
-
 (use-package visual-regexp-steroids
   :straight t
   )
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
