@@ -162,12 +162,13 @@
         (define-key counsel-gtags-mode-map (kbd "M-r") 'counsel-gtags-find-reference)
         (define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
         (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)))
-(use-package conda
-  :straight t
-  :init
-  (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
-  ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs"))
-  )
+(if (not (eq system-type 'windows-nt))
+    (use-package conda
+      :straight t
+      :init
+      (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
+      ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs"))
+      ))
 ;; (use-package corfu
 ;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
 ;;   ;; :bind (:map corfu-map
@@ -1093,9 +1094,11 @@
 (use-package org-roam-bibtex
   :straight t
   )
-(use-package org-roam-server
-  :straight t
-  )
+
+(if (not (eq system-type 'windows-nt))
+    (use-package org-roam-server
+      :straight t
+      ))
 (use-package org-sidebar
   :straight t
   )
@@ -1179,13 +1182,14 @@
      ((member project-type '(gradle grails)) "Spec")))
 
   )
-(use-package pyvenv
-  :straight t
-  :config
-    (setenv "home" (expand-file-name "~/anaconda3/envs"))
-    (pyvenv-mode 1)
-    (pyvenv-activate "base")
-  )
+(if (not (eq system-type 'windows-nt))
+    (use-package pyvenv
+      :straight t
+      :config
+      (setenv "home" (expand-file-name "~/anaconda3/envs"))
+      (pyvenv-mode 1)
+      (pyvenv-activate "base")
+      ))
 (use-package python-pytest
   :straight t
   )
