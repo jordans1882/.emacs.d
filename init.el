@@ -1,6 +1,9 @@
 ;; Misenplace:
 ;; My emacs config
 
+;; (require 'package)
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
 ;; Bootstrap straight.el
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -47,6 +50,18 @@
   :straight t
   :config
   (auctex-latexmk-setup))
+(use-package auto-dim-other-buffers
+  :straight (:host github :repo "mina86/auto-dim-other-buffers.el")
+  :config
+  (add-hook 'after-init-hook (lambda ()
+			       (when (fboundp 'auto-dim-other-buffers-mode)
+				 (auto-dim-other-buffers-mode t))))
+  )
+(use-package bash-completion
+  :straight t
+  :config
+  (bash-completion-setup)
+  )
 (use-package beacon
   :straight t
   :config
@@ -168,7 +183,73 @@
       :init
       (setq conda-anaconda-home (expand-file-name "~/anaconda3"))
       ;;(setq conda-env-home-directory (expand-file-name "~/anaconda3/envs"))
-      ))
+      )) ;; Conda
+(use-package consult
+  :straight t
+  ;; :config
+  ;; :hook (completion-list-mode . consult-preview-at-point-mode)
+  ;; ;; The :init configuration is always executed (Not lazy)
+  ;; :init
+
+  ;; ;; Optionally configure the register formatting. This improves the register
+  ;; ;; preview for `consult-register', `consult-register-load',
+  ;; ;; `consult-register-store' and the Emacs built-ins.
+  ;; (setq register-preview-delay 0
+  ;;       register-preview-function #'consult-register-format)
+
+  ;; ;; Optionally tweak the register preview window.
+  ;; ;; This adds thin lines, sorting and hides the mode line of the window.
+  ;; (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; ;; Use Consult to select xref locations with preview
+  ;; (setq xref-show-xrefs-function #'consult-xref
+  ;;       xref-show-definitions-function #'consult-xref)
+
+  ;; ;; Configure other variables and modes in the :config section,
+  ;; ;; after lazily loading the package.
+  ;; :config
+
+  ;; ;; Optionally configure preview. The default value
+  ;; ;; is 'any, such that any key triggers the preview.
+  ;; ;; (setq consult-preview-key 'any)
+  ;; ;; (setq consult-preview-key (kbd "M-."))
+  ;; ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; ;; For some commands and buffer sources it is useful to configure the
+  ;; ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  ;; (consult-customize
+  ;;  consult-theme
+  ;;  :preview-key '(:debounce 0.2 any)
+  ;;  consult-ripgrep consult-git-grep consult-grep
+  ;;  consult-bookmark consult-recent-file consult-xref
+  ;;  consult--source-file consult--source-project-file consult--source-bookmark
+  ;;  :preview-key (kbd "M-."))
+
+  ;; ;; Optionally configure the narrowing key.
+  ;; ;; Both < and C-+ work reasonably well.
+  ;; (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; ;; Optionally make narrowing help available in the minibuffer.
+  ;; ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; ;; Optionally configure a function which returns the project root directory.
+  ;; ;; There are multiple reasonable alternatives to chose from.
+  ;; ;;;; 1. project.el (project-roots)
+  ;; (setq consult-project-root-function
+  ;;       (lambda ()
+  ;;         (when-let (project (project-current))
+  ;;           (car (project-roots project)))))
+  ;; ;;;; 2. projectile.el (projectile-project-root)
+  ;; ;; (autoload 'projectile-project-root "projectile")
+  ;; ;; (setq consult-project-root-function #'projectile-project-root)
+  ;; ;;;; 3. vc.el (vc-root-dir)
+  ;; ;; (setq consult-project-root-function #'vc-root-dir)
+  ;; ;;;; 4. locate-dominating-file
+  ;; ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+  )
 ;; (use-package corfu
 ;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
 ;;   ;; :bind (:map corfu-map
@@ -200,7 +281,9 @@
   :straight t
   :config
   (counsel-projectile-mode)
-  (setq projectile-indexing-method 'native))
+  ;; TODO: Make check for windows - switch to native plus caching
+  ;; (setq projectile-indexing-method 'native)
+  )
 (use-package csharp-mode
   :straight t
   )
@@ -211,18 +294,46 @@
   :straight t
   :config
   (dashboard-setup-startup-hook)
+  (setq dashboard-items '(;; (recents  . 5)
+			  (projects . 5)
+			  ;; (bookmarks . 5)
+			  ;; (agenda . 5)
+			  ;;(registers . 5)
+			  ))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
-  (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png"))
+  (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png")
+  (add-to-list 'dashboard-items '(agenda) t)
+  (setq dashboard-week-agenda t)
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+  (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
+
+
+  )
 (use-package deft
   :straight t
   :config
   (require 'deft)
   (setq deft-directory "~/org")
   )
+;; (use-package dimmer
+;;   :straight t
+;;   :config
+;;   (dimmer-configure-which-key)
+;;   (dimmer-configure-helm)
+;;   (dimmer-mode t)
+;;   (setq dimmer-adjustment-mode ":background")
+;;   (setq dimmer-fraction 0.6)
+;;   )
 (use-package dockerfile-mode
   :straight t
   )
+;; (use-package dogears
+;;   :straight t
+;;   :config
+;;   (add-to-list 'dogears-hooks 'consult-after-jump-hook)
+;;
+;;   )
 (use-package doom-modeline
       :straight t
       :hook (after-init . doom-modeline-mode))
@@ -244,7 +355,9 @@
   (doom-themes-treemacs-config)
 
   ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+
+  )
 (use-package dumb-jump
   :straight t
   :bind (("M-g o" . dumb-jump-go-other-window)
@@ -256,6 +369,19 @@
   :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   )
+;; (use-package eaf
+;;   :straight t
+;;   :config
+;;   :load-path "~/.emacs.d/straight/repos/eaf" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
+;;
+;;   )
+;; (require 'eaf-browser)
+;; (require 'eaf-pdf-viewer)
+
+(use-package epc
+  :straight t
+  )
+
 (use-package eglot
   :straight t
   )
@@ -275,23 +401,92 @@
   :straight t
   :config
   (setq ess-use-flymake nil) ;; disable Flymake
+  (add-to-list 'auto-mode-alist '("\\.r\\'" . ess-r-mode))
+  (add-to-list 'auto-mode-alist '("\\.R\\'" . ess-r-mode))
+
   (add-hook 'ess-mode-hook '(lambda () (define-key ess-mode-map (kbd "M-<RET>") 'ess-eval-region-or-line-visibly-and-step)))
   (add-hook 'ess-mode-hook '(lambda () (define-key ess-mode-map (kbd "C-S-<RET>") 'ess-eval-region-or-function-or-paragraph-and-step)))
+
+  (defun ess-eval-structure (&optional vis)
+    "Send the current line to the inferior ESS process. VIS has same meaning as for `ess-eval-region'."
+    (interactive "P")
+    (let* ((beg (point-at-bol))
+	   (end (point-at-eol))
+	   (cmd (buffer-substring beg end))
+	   (msg (format "Structure for: %s" cmd)))
+      (ess-send-string (ess-get-process) (concat (concat "str(" cmd) ")" ) t))
   )
+
+  (defun ess-eval-structure (&optional vis)
+    "Send the current line to the inferior ESS process. VIS has same meaning as for `ess-eval-region'."
+    (interactive "P")
+    (let* ((beg (point-at-bol))
+	   (end (point-at-eol))
+	   (cmd (thing-at-point 'word 'no-properties))
+	   (msg (format "Structure for: %s" cmd)))
+      (ess-send-string (ess-get-process) (concat (concat "str(" cmd) ")" ) t))
+  )
+
+ (defun asb-read-into-string (buffer)
+ (with-current-buffer buffer
+   (buffer-string)))
+
+ (defun asb-ess-R-object-popup (r-func)
+   "R-FUNC: The R function to use on the object.
+ Run R-FUN for object at point, and display results in a popup."
+   (let ((objname (current-word))
+         (tmpbuf (get-buffer-create "**ess-R-object-popup**")))
+     (if objname
+         (progn
+           (ess-command (concat "class(" objname ")\n") tmpbuf)
+           (let ((bs (asb-read-into-string tmpbuf)))
+             (if (not(string-match "\(object .* not found\)\|unexpected" bs))
+                 (progn
+                   (ess-command (concat r-func "(" objname ")\n") tmpbuf)
+                   (let ((bs (asb-read-into-string tmpbuf)))
+                     (popup-tip bs
+ 		       :scroll-bar t)))))))
+   (kill-buffer tmpbuf)))
+
+ (defun asb-ess-R-object-popup-str ()
+   "Popup structure of R object."
+   (interactive)
+   (asb-ess-R-object-popup "str"))
+
+ (defun asb-ess-R-object-popup-cls ()
+   "Popup class of R object."
+   (interactive)
+   (asb-ess-R-object-popup "class"))
+
+ (defun asb-ess-R-object-popup-interactive (r-func)
+   "R Object Interactive Popup.
+ R-FUNC: An R function to use on object"
+   (interactive "sR function to execute: ")
+   (asb-ess-R-object-popup r-func))
+)
 (use-package emacs
   :config
   ;; Appearance
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (set-frame-parameter (selected-frame) 'alpha '(95 50))
-  (add-to-list 'default-frame-alist '(alpha 95 50))
-  (tool-bar-mode -1)
+  (set-face-attribute 'default nil :height 170)          ;; Font size
+  (menu-bar-mode -1)                                     ;; Remove top Menu
+  (tool-bar-mode -1)                                     ;; Remove top toolbar
+  (scroll-bar-mode -1)                                   ;; Remove scrollbar
+  (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
+  (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
-  (setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
+
+
+  ;; Functionality
+  (setq backup-directory-alist `(("." . "~/.emacs.d/.saves"))) ;; Set backups directory
+  (setq auto-save-file-name-transforms                   ;; Set autosave directory
+  `((".*" "~/.emacs.d/auto-saves/" t)))
+
+  (setq tab-bar-select-tab-modifiers "meta")
+
 
   ;; Utility funs
   (defun dawn ()
-    "Set theme to day"
+    "Set theme to dawn"
     (interactive)
     (counsel-load-theme-action "doom-gruvbox-light"))
   (defun day ()
@@ -299,7 +494,7 @@
     (interactive)
     (counsel-load-theme-action "doom-solarized-light"))
   (defun sunny ()
-    "Set theme to day"
+    "Set theme to sunny"
     (interactive)
     (counsel-load-theme-action "doom-nord-light"))
   (defun dusk ()
@@ -311,10 +506,34 @@
     (interactive)
     (counsel-load-theme-action "doom-gruvbox"))
   (defun late-night ()
-    "Set theme to night"
+    "Set theme to late-night"
     (interactive)
     (counsel-load-theme-action "doom-Iosvkem"))
 
+
+  (defun set-target-buffer (buffer)
+    "Switch to BUFFER.
+ BUFFER may be a string or nil."
+    (setq target-buffer buffer))
+
+  (defun ivy-set-process-target ()
+    "Switch to another buffer."
+    (interactive)
+    (ivy-read "Switch to buffer: " #'internal-complete-buffer
+	      :keymap ivy-switch-buffer-map
+	      :preselect (buffer-name (other-buffer (current-buffer)))
+	      :action #'set-target-buffer
+	      :matcher #'ivy--switch-buffer-matcher
+	      :caller 'ivy-switch-buffer))
+
+  (defun send-line-to-target-process ()
+    "Send a line to process defined by target-buffer."
+    (interactive)
+    (setq proc (get-process target-buffer))
+    (setq com (concat (buffer-substring (point-at-bol) (point-at-eol)) "\n"))
+    (process-send-string target-buffer com)
+    (next-line)
+  )
 
   ;;;;;;;;;;;;;;;;;;;;;;;
   ;; Project Templates ;;
@@ -334,14 +553,73 @@
      (shell-command-to-string rm-git-command)
      (magit-init proj-dir) ;; use hub for this?
      (projectile-add-known-project proj-dir)
-     ;; TODO: Add project to treemacs known workspaces for make-python-project
-     ;; (treemacs-add-project-to-workspace projectdir projectname)
+     )
+
+   (defun select-tab-first ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 1))
+   (defun select-tab-second ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 2))
+   (defun select-tab-third ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 3))
+   (defun select-tab-fourth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 4))
+   (defun select-tab-fifth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 5))
+   (defun select-tab-sixth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 6))
+   (defun select-tab-seventh ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 7))
+   (defun select-tab-eighth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 8))
+   (defun select-tab-ninth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 9))
+
+   (defun make-r-project ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (setq python-template-repo "git@github.com:jordans1882/templater.git")
+     (setq proj-name (read-string "Enter your project name:"))
+     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+     ;; TODO: Add check if project already exists for make-python-project
+     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
+     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+     (shell-command-to-string clone-command)
+     (shell-command-to-string rm-git-command)
+     (magit-init proj-dir) ;; use hub for this?
+     (projectile-add-known-project proj-dir)
      )
 
 
 
 
+  (add-hook 'lisp-interaction-mode-hook 'company-mode)
+
+
   )
+(use-package native-complete
+  :straight (:host github :repo "CeleritasCelery/emacs-native-shell-complete")
+  :config
+   (with-eval-after-load 'shell
+     (native-complete-setup-bash))
+   )
 (use-package evil
    :straight t
    :init
@@ -378,8 +656,8 @@
    (define-key evil-normal-state-map " " my-second-leader-map)
    (define-key evil-visual-state-map "," my-leader-map)
    (define-key evil-visual-state-map " " my-second-leader-map)
-   (define-key evil-normal-state-map (kbd "/") 'swiper)
-   (define-key evil-normal-state-map (kbd "?") 'swiper-backward)
+   (define-key evil-normal-state-map (kbd "/") 'swiper-isearch)
+   (define-key evil-normal-state-map (kbd "?") 'swiper-isearch-backward)
 
    ;; Manually add in my-leader-map bindings to states
    ;; (define-key compilation-mode-map "," my-leader-map)
@@ -398,6 +676,13 @@
 (use-package evil-nerd-commenter
   :straight t
   )
+(use-package evil-org
+  :straight t
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 (use-package fill-column-indicator
   :straight t
   )
@@ -419,37 +704,83 @@
   )
 (use-package general
   :straight t
-  :after (:all which-key hydra)
+  :after (:all which-key hydra org-super-agenda)
   :config
   ;; (general-evil-setup t)
 
   ;; Define evil-globals
+
+  (general-create-definer misenplace/leader-keys
+			  :states '(normal insert visual emacs)
+			  :prefix ","
+			  :global-prefix "C-,"
+			  )
+
+  (general-define-key
+     :states '(normal)
+     :keymaps '(global-map evil-normal-state-map)
+     "f" 'link-hint-open-link
+     "C-o" 'gumshoe-persp-backtrack-back
+     "C-i" 'gumshoe-persp-backtrack-forward
+     )
+
+
   (general-define-key
      :states '(normal visual insert)
      :keymaps '(global-map evil-normal-state-map)
      "C-=" 'text-scale-increase
      "C--" 'text-scale-decrease
+     "C-w" 'tab-bar-close-tab
+     "M-1" 'select-tab-first
+     "M-2" 'select-tab-second
+     "M-3" 'select-tab-third
+     "M-4" 'select-tab-fourth
+     "M-5" 'select-tab-fifth
+     "M-6" 'select-tab-sixth
+     "M-7" 'select-tab-seventh
+     "M-8" 'select-tab-eighth
+     "M-9" 'select-tab-ninth
      "M-C-j" 'evil-window-decrease-height
      "M-C-k" 'evil-window-increase-height
      "M-C-h" 'evil-window-decrease-width
      "M-C-l" 'evil-window-increase-width
-     "M-l" 'evil-window-right
+     "M-l"
+"M-l"
+
+"M-l"
+
+"M-l"
+
+"M-l"
+'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
      "M-h" 'evil-window-left
      "M-d" 'evil-window-delete
+     "M-r" 'tab-bar-rename-tab
      "M-s" 'evil-window-split
      "M-v" 'evil-window-vsplit
      "M-S-j" 'evil-rotate-upwards
      "M-S-k" 'evil-rotate-downwards
-     "M-<tab>" 'tab-window-increase-width
+     ;; "M-S-<tab>" 'tab-bar-switch-to-prev-tab
+     ;; "M-<tab>" 'tab-bar-switch-to-prev-tab
      "M-C-r" 'restart-emacs
      "M-S-c" 'evil-window-delete
      "M-q" 'evil-window-delete
      "C-q" 'evil-delete-buffer
      "C-Q" 'evil-quit
+     "C-o" 'gumshoe-persp-backtrack-back
+     "C-t" 'tab-bar-new-tab
+     "C-i" 'gumshoe-persp-backtrack-forward
+     "C-<SPACE>" 'send-line-to-target-process
+     "C-<tab>" 'tab-bar-switch-to-next-tab
+     [(control shift iso-lefttab)] 'tab-bar-switch-to-prev-tab
      "ESC ESC ESC" 'evil-normal-state
+     "C-k" 'kill-word
      )
+
+
+  ;; (global-set-key [(control shift iso-lefttab)] 'tab-previous))
 
 
   ;; Define evil normals and visuals
@@ -461,6 +792,8 @@
      "zk" 'origami-previous-fold
      "zn" 'origami-next-fold
      "zp" 'origami-previous-fold
+     "C-o" 'gumshoe-persp-backtrack-back
+     "C-i" 'gumshoe-persp-backtrack-forward
      )
 
 
@@ -468,21 +801,111 @@
   (general-define-key
      :states '(normal visual)
      :keymaps '(lisp-interaction-mode-map)
-     "M-<RET>" 'eval-defun)
+
+     ;; General
+     "M-<RET>" 'eval-defun
+     "C-o" 'gumshoe-persp-backtrack-back
+     "C-i" 'gumshoe-persp-backtrack-forward
+  )
+
+
+  ;; Treemacs modemap bindings
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(treemacs-mode-map)
+
+     ;; General
+     "M-l" 'evil-window-right
+     "M-d" 'treemacs-quit
+  )
+
+
+  ;; Org-agenda modemap bindings
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(org-agenda-mode-map)
+
+     ;; General
+     "j" 'org-agenda-next-line
+     "k" 'org-agenda-previous-line
+  )
+
+
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(org-super-agenda-header-map)
+
+     ;; General
+     "j" 'org-agenda-next-line
+     "k" 'org-agenda-previous-line
+  )
+
+
+
+  ;; Define python modes
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(ess-r-mode-map)
+
+     ;; General
+     "M-<RET>" 'ess-eval-region-or-line-and-step
+
+     ",l" '(:ignore t :which-key "R")
+     ",ldi" '(asb-ess-R-object-popup-str :which-key "inspect")
+     ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
+     ",ldc" '(asb-ess-R-object-popup-cls :which-key "class")
+     ",lh" 'ess-eval-region-or-line-and-step
+     ",li" '(asb-ess-R-object-popup-str :which-key "inspect")
+     ",lI" '(ess-r-devtools-install-package :which-key "install package")
+     ",lL" '(ess-r-devtools-install-package :which-key "load package")
+     ",lo" '(ess-rdired :which-key "object")
+     ",lp" '(:ignore t :which-key "project")
+     ",lpb" '(ess-r-devtools-build :which-key "build")
+     ",lpc" '(ess-r-devtools-check-package :which-key "check")
+     ",lpt" '(ess-r-devtools-test-package :which-key "test")
+     ",lq" '(ess-watch-quit :which-key "quit")
+     ",lt" '(ess-eval-structure :which-key "structure")
+     )
+
+
+
+  ;; Define org modes
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(org-mode-map)
+
+     ;; General
+     "M-o" 'org-open-at-point
+     "M-l" 'evil-window-right
+     "M-j" 'evil-window-down
+     "M-k" 'evil-window-up
+     "M-h" 'evil-window-left
+     "M-SPC" 'send-line-to-target-process
+     )
+
 
   ;; Define python modes
   (general-define-key
      :states '(normal visual)
      :keymaps '(python-mode-map)
+
+     ;; General
      "M-<RET>" 'elpy-shell-send-statement-and-step)
+
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(python-mode-map)
+     :prefix ","
+
+     ;; Tests
+     "x" '(:ignore t :which-key "tests")
+     "xx" '(python-pytest-function-dwim :which-key "this")
+     "xm" '(python-pytest-dispatch :which-key "menu")
+     "xf" '(python-pytest-file :which-key "file"))
+
 
 
   ;; Define Leader
-  (general-create-definer misenplace/leader-keys
-			  :states '(normal insert visual emacs)
-			  :prefix ","
-			  :global-prefix "C-,"
-			  )
   (misenplace/leader-keys
    ;; Agenda
    "a" '(:ignore t :which-key "agenda")
@@ -517,6 +940,12 @@
    "db" '(dumb-jump-back :which-key "back")
    "do" '(dumb-jump-go-other-window :which-key "go other")
    "dq" '(dumb-jump-quick-look :which-key "quick-look")
+
+
+   ;; TODO: add comment line key-binding
+   ;; "e" '(:ignore t :which-key "edit")
+   ;; "ec" '(evilnc-comment-or-uncomment-lines :which-key "toggle comment")
+
 
    ;; Errors
    "e" '(:ignore t :which-key "errors")
@@ -571,6 +1000,10 @@
    "hv" '(counsel-describe-variable :which-key "variable")
    "hs" '(counsel-describe-symbol :which-key "symbol")
 
+   ;; Imenu
+   "i" '(:ignore t :which-key "imenu")
+   "ii" '(imenu-list :which-key "list")
+
    ;; Jump
    "j" '(:ignore t :which-key "jump")
    "jb" '(counsel-cheatsheets :which-key "back")
@@ -582,6 +1015,10 @@
 
    ;; Org
    "o" '(:ignore t :which-key "org")
+   "oa" '(:ignore t :which-key "agenda")
+   "oas" '(org-schedule :which-key "schedule")
+   "oad" '(org-deadline :which-key "deadline")
+   "oap" '(org-set-property :which-key "property")
    "od" '(deft :which-key "deft")
    "oc" '(:ignore t :which-key "capture/clock")
    "occ" '(org-capture :which-key "capture")
@@ -594,7 +1031,7 @@
    "ordc" '(org-roam-dailies-capture-today :which-key "capture")
    "ordf" '(org-roam-dailies-find-today :which-key "find")
 
-
+   ;; Projects
    "p" '(:ignore t :which-key "projects")
    "pA" '(projectile-add-known-project :which-key "add")
    "pa" '(counsel-projectile-org-agenda :which-key "agenda")
@@ -615,12 +1052,32 @@
    ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
    ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
 
+   ;; R language bindings
+   ;; TODO: Fold R-bindings into something more general
+   "r" '(:ignore t :which-key "R")
+   "rI" '(ess-r-devtools-install-package :which-key "install package")
+   "rL" '(ess-r-devtools-install-package :which-key "load package")
+   "rp" '(:ignore t :which-key "project")
+   "rpb" '(ess-r-devtools-build :which-key "build")
+   "rpc" '(ess-r-devtools-check-package :which-key "check")
+   "rpt" '(ess-r-devtools-test-package :which-key "test")
+   "rh" '(ess-display-help-on-object :which-key "help")
+   "ro" '(ess-rdired :which-key "object")
+   "rt" '(ess-eval-structure :which-key "structure")
+   "ri" '(asb-ess-R-object-popup-str :which-key "inspect")
+   "rdi" '(asb-ess-R-object-popup-str :which-key "inspect")
+   "rdI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
+   "rdc" '(asb-ess-R-object-popup-cls :which-key "class")
+   "rr" '(ess-eval-region-and-go :which-key "eval")
+   "rq" '(ess-watch-quit :which-key "quit")
 
-
-   ;; TODO: change tab bindings to be like window bindings in awesome
-   ;; Tabs
+   ;; Todos
    "t" '(:ignore t :which-key "todos")
    "tt" '(ivy-magit-todos :which-key "todos")
+
+   ;; Tabs
+   ;; TODO: Create tab bindings
+   ;; TODO: Add tab bindings to be like window bindings in awesome
    ;; "<TAB><TAB>" '(tab-bar-select-tab-by-name :which-key "tabs")
    ;; (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
    ;; (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
@@ -631,7 +1088,18 @@
    ;; (define-key my-leader-map "tr" 'tab-bar-rename-tab)
    ;; (define-key my-leader-map "tL" 'tab-bar-move-tab)
 
-
+   ;; UI
+   "u" '(:ignore t :which-key "ui")
+   "ud" '(day :which-key "Day Theme")
+   "uD" '(dusk :which-key "Dusk Theme")
+   "ue" '(day :which-key "Evening Theme")
+   "un" '(day :which-key "Night Theme")
+   "us" '(hydra-text-scale/body :which-key "scale text")
+   "ut" '(:ignore t :which-key "toggle")
+   "uT" '(counsel-load-theme :which-key "Theme")
+   "utt" '(toggle-transparency :which-key "toggle transparency")
+   "utm" '(hide-mode-line-mode :which-key "toggle mode line")
+   "utM" '(toggle-menu-bar-from-frame :which-key "toggle menu bar")
 
    ;; Windows
    "w" '(:ignore t :which-key "window")
@@ -656,18 +1124,18 @@
    "w|" '(evil-window-vsplit :which-key "vsplit")
    "w|" '(balance-windows :which-key "balance")
 
-  ;; Make into a hydra
+  ;; TODO: Create window resizing hydra
   ;;  (define-key my-leader-map "wJ" 'evil-window-decrease-height)
   ;;  (define-key my-leader-map "wK" 'evil-window-increase-height)
   ;;  (define-key my-leader-map "wH" 'evil-window-decrease-width)
   ;;  (define-key my-leader-map "wL" 'evil-window-increase-width)
 
 
-   "x" '(:ignore t :which-key "edit")
-   "xs" '(hydra-text-scale/body :which-key "scale text")
-   "xc" '(evilnc-comment-or-uncomment-lines :which-key "toggle comment")
+   ;; Snippets
+   "y" '(:ignore t :which-key "yasnippets")
+   "yy" '(yas-insert-snippet :which-key "insert snippet")
 
-
+   ;; Folds
    "z" '(:ignore t :which-key "folds")
    "zz" '(origami-toggle-node :which-key "toggle fold")
    "za" '(origami-toggle-node :which-key "toggle fold")
@@ -677,20 +1145,6 @@
    "zp" '(origami-previous-fold :which-key "previous fold")
    "zr" '(origami-open-all-nodes :which-key "open all folds")
    "zm" '(origami-close-all-nodes :which-key "close all folds")
- ;;  "n" '(:ignore t :which-key "n-test")
- ;;  "nt" '(counsel-load-theme :which-key "choose theme")
-
-  ;; (which-key-add-key-based-replacements ",g" "git")
-  ;; (which-key-add-key-based-replacements ",h" "help")
-  ;; (which-key-add-key-based-replacements ",j" "jump")
-  ;; (which-key-add-key-based-replacements ",p" "projects")
-  ;; (which-key-add-key-based-replacements ",o" "org")
-  ;; (which-key-add-key-based-replacements ",r" "R")
-  ;; (whica-key-add-key-based-replacements ",t" "tabs")
-  ;; (which-key-add-key-based-replacements ",x" "edit")
-  ;; (which-key-add-key-based-replacements ",w" "windows")
-  ;; (which-key-add-key-based-replacements ",y" "yas")
-
    )
   )
 (use-package git-messenger
@@ -709,6 +1163,34 @@
   )
 (use-package ghub
   :straight t
+  )
+(use-package gumshoe
+  :straight (gumshoe :type git
+                     :host github
+                     :repo "Overdr0ne/gumshoe"
+                     :branch "master")
+  :config
+  ;; The minor mode must be enabled to begin tracking
+  (global-gumshoe-mode 1)
+  ;; Similarly for the perspective-local gumshoe:
+  ;; (global-gumshoe-persp-mode 1)
+  ;; Similarly for the buffer-local gumshoe:
+  (global-gumshoe-buf-mode 1)
+  ;; define a command for autocompletion of the gumshoe--global log if you’d like:
+  (defun consult-gumshoe-global ()
+    "List global gumshoes in consult"
+    (interactive)
+    (consult-global-mark (ring-elements (oref gumshoe--global-backlog log))))
+  ;; Similarly, for the persp local gumshoe--persp log, assuming perspectives is installed:
+  (defun consult-gumshoe-persp ()
+    "List perspective gumshoes in consult"
+    (interactive)
+    (consult-global-mark (ring-elements (oref gumshoe--persp-backlog log))))
+  ;; Similarly, for the buffer local gumshoe--persp log:
+  (defun consult-gumshoe-buf ()
+    "List buffer gumshoes in consult"
+    (interactive)
+    (consult-global-mark (ring-elements (oref gumshoe--buf-backlog log))))
   )
 (use-package hl-todo
   :straight t
@@ -764,6 +1246,9 @@
   ;; (misenplace/leader-keys
   ;;   "xs" '(hydra-text-scale/body :which-key "scale text"))
   )
+(use-package imenu-list
+  :straight t
+  )
 (use-package irony
   :straight t
   :config
@@ -801,6 +1286,9 @@
         (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
   (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: Figure out why keycast package doesn't work
+(use-package link-hint
+  :straight t
+)
 ;; (use-package lispy
 ;;   :straight t
 ;;   :hook ((emacs-lisp-mode . lispy-mode)
@@ -817,6 +1305,15 @@
   )
 (use-package lsp-mode
   :straight t
+  :commands lsp
+  :config
+  (add-to-list 'lsp-language-id-configuration '(csharp-mode . "csharp"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/bin/omnisharp" "-lsp"))
+                    :major-modes '(csharp-mode)
+                    :server-id 'csharp))
+  (add-hook 'ess-r-mode-hook 'lsp-mode)
+  (add-hook 'ess-r-mode-hook 'lsp)
 )
 (use-package lua-mode
   :straight t
@@ -863,6 +1360,19 @@
 (use-package magit-todos
   :straight t
   )
+(use-package marginalia
+  :straight t
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         :map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
 ;; (use-package magithub
 ;;   :straight t
 ;;   :after magit
@@ -893,6 +1403,9 @@
   :straight t
   :config
   (setq ob-mermaid-cli-path "~/mermaid/node_modules/.bin/mmdc"))
+;; (use-package omnisharp-emacs
+;;   :straight (:host github :repo "OmniSharp/omnisharp-emacs")
+;;   )
 (use-package org
   :straight t
   :config
@@ -905,6 +1418,7 @@
   ;; Org file location settigns
   (setq org-directory "~/org/")
   (setq org-default-notes-file (concat org-directory "/todo.org"))
+  (setq org-agenda-files (list org-directory))
 
   ;; Org-agenda settings
   (setq org-agenda-include-all-todo t)
@@ -913,6 +1427,7 @@
   ;; Org todo keywords
   (setq org-todo-keywords
         '((sequence "PIPELINE"
+                    "NEXT"
                     "TODO"
                     "DONE")))
 
@@ -937,39 +1452,39 @@
 
   (setq org-confirm-babel-evaluate nil)
   (setq org-latex-image-default-width "")
-(setq org-latex-classes
-  '(("article"
-     "\\documentclass[11pt]{article}"
-     ("\\section{%s}" . "\\section*{%s}")
-     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-     ("\\paragraph{%s}" . "\\paragraph*{%s}")
-     ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-    ("report"
-     "\\documentclass[11pt]{report}"
-     ("\\part{%s}" . "\\part*{%s}")
-     ("\\chapter{%s}" . "\\chapter*{%s}")
-     ("\\section{%s}" . "\\section*{%s}")
-     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-    ("book"
-     "\\documentclass[11pt]{book}"
-     ("\\part{%s}" . "\\part*{%s}")
-     ("\\chapter{%s}" . "\\chapter*{%s}")
-     ("\\section{%s}" . "\\section*{%s}")
-     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-    ("beamer"
-      "\\documentclass\[presentation\]\{beamer\}"
-      ("\\section\{%s\}" . "\\section*\{%s\}")
-      ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-      ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
-    ("IEEEtran"
-     "\\documentclass{IEEEtran}"
-     ("\\section{%s}" . "\\section*{%s}")
-     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-    ))
+  (setq org-latex-classes
+	'(("article"
+	   "\\documentclass[11pt]{article}"
+	   ("\\section{%s}" . "\\section*{%s}")
+	   ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+	  ("report"
+           "\\documentclass[11pt]{report}"
+           ("\\part{%s}" . "\\part*{%s}")
+           ("\\chapter{%s}" . "\\chapter*{%s}")
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+	  ("book"
+           "\\documentclass[11pt]{book}"
+           ("\\part{%s}" . "\\part*{%s}")
+           ("\\chapter{%s}" . "\\chapter*{%s}")
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+	  ("beamer"
+           "\\documentclass\[presentation\]\{beamer\}"
+           ("\\section\{%s\}" . "\\section*\{%s\}")
+           ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+           ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))
+	  ("IEEEtran"
+           "\\documentclass{IEEEtran}"
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+	  ))
 
   (setq org-latex-listings t)
 
@@ -998,7 +1513,13 @@
       (unless (= (current-column) 2)
         (insert "\n\n  "))))
 
-
+  ;; TODO: work on org-capture templates
+  (setq org-capture-templates
+	'(("a" "Appointment" entry (file "~/org/schedule.org")
+	   "* %? \n\n:Properties:\n:calendar-id: jordans1882@gmail.com\n:LOCATION:\n:END:\n\n:org-gcal:\n%^T\n:END:\n\n")
+	  ("i" "inbox" entry (file "~/org/inbox.org")
+	   "* TODO %?")
+	  ))
   )
 (use-package ox-reveal
   :straight t
@@ -1042,6 +1563,7 @@
   )
 (use-package org-projectile
   :straight t
+  :after org
   :preface
       (setq org-roam-v2-ack t)
   :bind (
@@ -1053,7 +1575,11 @@
     (setq org-projectile-per-project-filepath "todo.org")
     ;; (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files)))
     (global-set-key (kbd "C-c c") 'org-capture)
-    (global-set-key (kbd "C-c n p") 'org-projectile-project-todo-completing-read)))
+    (global-set-key (kbd "C-c n p") 'org-projectile-project-todo-completing-read)
+
+    )
+
+  )
 (use-package org-roam
       :straight t
       :hook
@@ -1094,17 +1620,250 @@
 (use-package org-roam-bibtex
   :straight t
   )
-
 (if (not (eq system-type 'windows-nt))
     (use-package org-roam-server
       :straight t
-      ))
+
+     (setq org-roam-server-host "127.0.0.1"
+           org-roam-server-port 8080
+           org-roam-server-authenticate nil
+           org-roam-server-export-inline-images t
+           org-roam-server-serve-files nil
+           org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+           org-roam-server-network-poll t
+           org-roam-server-network-arrows nil
+           org-roam-server-network-label-truncate t
+           org-roam-server-network-label-truncate-length 60
+      ))) ;; Org-Roam
 (use-package org-sidebar
   :straight t
   )
 (use-package org-super-agenda
   :straight t
-  )
+  :init (org-super-agenda-mode t)
+  :config
+  (setq org-agenda-custom-commands
+	'(
+
+("d" "Dissertation view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '(
+                          (:name "Dissertation"
+                                 :tag "dissertation"
+                                 :order 20)
+                          (:discard (:tag ("emacs" "general" "home" "inbox" "navy" "qubbd")))))))))
+
+("e" "Emacs view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '(
+                          (:name "Emacs"
+                                 :tag "Emacs"
+                                 :order 20)
+                          (:discard (:tag ("dissertation" "general" "home" "inbox" "navy" "qubbd")))))))))
+
+("h" "Home view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Chores"
+                                 :tag "chores"
+                                 :order 18)
+                          (:name "In-town Shopping"
+                                 :tag "intown_shopping"
+                                 :order 18)
+                          (:name "Online Shopping"
+                                 :tag "online_shopping"
+                                 :order 18)
+                          (:name "Food Prep"
+                                 :tag "food_prep"
+                                 :order 19)
+                          (:name "Errands"
+                                 :tag "errands"
+                                 :order 19)
+                          (:name "Emacs"
+                                 :tag "Emacs"
+                                 :order 20)
+                          (:name "To read"
+                                 :tag "Read"
+                                 :order 30)
+                          (:discard (:tag ("dissertation" "navy" "qubbd")))))))))
+
+
+("i" "Inbox view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '(
+                          (:name "Inbox"
+                                 :tag "inbox"
+                                 :order 20)
+                          (:discard (:tag ("dissertation" "general" "home" "inbox" "navy" "qubbd" "Emacs")))))))))
+
+
+("n" "Navy view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '(
+                          (:name "Navy"
+                                 :tag "navy"
+                                 :order 20)
+                          (:discard (:tag ("emacs" "dissertation" "general" "home" "inbox" "navy" "qubbd")))))))))
+
+
+
+("w" "Work view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Next to do"
+                                 :todo "NEXT"
+                                 :order 1)
+                          (:name "Important"
+                                 :tag "Important"
+                                 :priority "A"
+                                 :order 6)
+                          (:name "Due Today"
+                                 :deadline today
+                                 :order 2)
+                          (:name "Due Soon"
+                                 :deadline future
+                                 :order 8)
+                          (:name "Overdue"
+                                 :deadline past
+                                 :order 7)
+                          (:name "General"
+                                 :tag "general"
+                                 :order 10)
+                          (:name "Dissertation"
+                                 :tag "dissertation"
+                                 :order 15)
+                          (:name "To read"
+                                 :tag "Read"
+                                 :order 30)
+                          (:name "Waiting"
+                                 :todo "WAITING"
+                                 :order 20)
+                          (:name "trivial"
+                                 :priority<= "C"
+                                 :tag ("Trivial" "Unimportant")
+                                 :todo ("SOMEDAY" )
+                                 :order 90)
+                          (:discard (:tag ("home" "Emacs")))))))))
+
+
+("z" "Super zaen view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :todo "TODAY"
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Next to do"
+                                 :todo "NEXT"
+                                 :order 1)
+                          (:name "Important"
+                                 :tag "Important"
+                                 :priority "A"
+                                 :order 6)
+                          (:name "Due Today"
+                                 :deadline today
+                                 :order 2)
+                          (:name "Due Soon"
+                                 :deadline future
+                                 :order 8)
+                          (:name "Overdue"
+                                 :deadline past
+                                 :order 7)
+                          (:name "General"
+                                 :tag "general"
+                                 :order 10)
+                          (:name "Dissertation"
+                                 :tag "dissertation"
+                                 :order 15)
+                          (:name "Emacs"
+                                 :tag "Emacs"
+                                 :order 19)
+                          (:name "Chores"
+                                 :tag "chores"
+                                 :order 18)
+                          (:name "In-town Shopping"
+                                 :tag "intown_shopping"
+                                 :order 18)
+                          (:name "Online Shopping"
+                                 :tag "online_shopping"
+                                 :order 18)
+                          (:name "Food Prep"
+                                 :tag "food_prep"
+                                 :order 19)
+                          (:name "Errands"
+                                 :tag "errands"
+                                 :order 19)
+                          (:name "To read"
+                                 :tag "Read"
+                                 :order 30)
+                          (:name "Waiting"
+                                 :todo "WAITING"
+                                 :order 20)
+                          (:name "trivial"
+                                 :priority<= "C"
+                                 :tag ("Trivial" "Unimportant")
+                                 :todo ("SOMEDAY" )
+                                 :order 90)
+                          (:discard (:tag ("Chore" "Routine" "Daily")))))))))
+
+	))
+)
 (use-package org-transclusion
   :straight (:host github :repo "nobiot/org-transclusion"))
 ;; (use-package orderless
@@ -1123,6 +1882,7 @@
   :straight t
   :init
   (persp-mode)
+  (global-gumshoe-persp-mode 1)
   )
 (use-package persp-projectile
   :straight t
@@ -1189,7 +1949,10 @@
       (setenv "home" (expand-file-name "~/anaconda3/envs"))
       (pyvenv-mode 1)
       (pyvenv-activate "base")
-      ))
+      )) ;; PYENV
+(use-package pycoverage
+  :straight t
+  )
 (use-package python-pytest
   :straight t
   )
@@ -1219,11 +1982,11 @@
 (use-package swiper
   :straight t
   )
-;; (use-package vertico
-;;   :straight t
-;;   :init
-;;   (vertico-mode)
-;; )
+(use-package vertico
+  :straight t
+  :init
+  (vertico-mode)
+)
 (use-package theme-magic
   :straight t
   :config
@@ -1326,221 +2089,6 @@
   :straight t
   :config
   (which-key-mode)
-
-  ;; binding "SPC-t" for toggles
-  (define-key my-second-leader-map "t" '("agenda-prefix"))
-  ;; toggle theme
-  (define-key my-second-leader-map "ttt" 'toggle-transparency)
-  (define-key my-second-leader-map "ttd" 'day)
-  (define-key my-second-leader-map "ttD" 'dusk)
-  (define-key my-second-leader-map "tte" 'evening)
-  (define-key my-second-leader-map "ttn" 'night)
-  ;; toggle modelines
-  (define-key my-second-leader-map "tM" 'toggle-menu-bar-mode-from-frame)
-  (define-key my-second-leader-map "tm" 'hide-mode-line-mode)
-
-  ;; binding for comments
-  (define-key my-second-leader-map "c" '("comment-prefix"))
-  (define-key my-second-leader-map "cc" 'evilnc-comment-or-uncomment-lines)
-
-  ;; ;; binding ",a" for agenda (todo manager)
-  ;; (define-key my-leader-map "a" '("agenda-prefix"))
-  ;; (define-key my-leader-map "aa" 'org-agenda)
-  ;; (define-key my-leader-map "as" 'org-schedule)
-  ;; (define-key my-leader-map "an" 'org-projectile-capture-for-current-project)
-  ;; (define-key my-leader-map "acc" 'counsel-org-clock-goto)
-  ;; (define-key my-leader-map "aci" 'org-clock-in)
-  ;; (define-key my-leader-map "ach" 'counsel-org-clock-history)
-  ;; (define-key my-leader-map "aco" 'org-clock-out)
-  ;; (define-key my-leader-map "agp" 'org-projectile-goto-location-for-project)
-  ;; (define-key my-leader-map "at" 'org-todo)
-  ;; (define-key my-leader-map "ap" 'org-pomodoro)
-
-  ;; ;; binding ",b" for buffers
-  ;; (define-key my-leader-map "b" '("buffer-prefix"))
-  ;; (define-key my-leader-map "bb" 'switch-to-buffer)
-  ;; (define-key my-leader-map "bl" 'next-buffer)
-  ;; (define-key my-leader-map "bh" 'previous-buffer)
-  ;; (define-key my-leader-map "bc" 'evil-buffer-new)
-  ;; (define-key my-leader-map "bn" 'evil-next-buffer)
-  ;; (define-key my-leader-map "bp" 'evil-prev-buffer)
-  ;; (define-key my-leader-map "bd" 'evil-delete-buffer)
-  ;; (define-key my-leader-map "br" 'rename-buffer)
-
-  ;; ;; binding ",c" for nerd commenter
-  ;; (define-key my-leader-map "c" '("comment-prefix"))
-  ;; (define-key my-leader-map "cc" 'evilnc-comment-or-uncomment-lines)
-
-  ;; ;; binding ",d" for dumb-jump
-  ;; (define-key my-leader-map "d" '("dumb-jump-prefix"))
-  ;; (define-key my-leader-map "dd" 'dumb-jump-go)
-  ;; (define-key my-leader-map "db" 'dumb-jump-back)
-  ;; (define-key my-leader-map "do" 'dumb-jump-go-other-window)
-  ;; (define-key my-leader-map "dp" 'dumb-jump-go-prompt)
-  ;; (define-key my-leader-map "dq" 'dumb-jump-quick-look)
-
-  ;; ;; binding ",e" for error (flycheck)
-  ;; (define-key my-leader-map "e" '("evilnc-prefix"))
-  ;; (define-key my-leader-map "ee" 'flycheck-list-errors)
-  ;; (define-key my-leader-map "e/" 'counsel-flycheck)
-  ;; (define-key my-leader-map "ej" 'flycheck-next-error)
-  ;; (define-key my-leader-map "ek" 'flycheck-previous-error)
-  ;; (define-key my-leader-map "en" 'flycheck-next-error)
-  ;; (define-key my-leader-map "ep" 'flycheck-previous-error)
-
-  ;; ;; binding " f" for files
-  ;; (define-key my-leader-map "f" '("files-prefix"))
-  ;; (define-key my-leader-map "ff" 'treemacs)
-  ;; (define-key my-leader-map "fc" 'treemacs-create-file)
-  ;; (define-key my-leader-map "fC" 'treemacs-create-dir)
-  ;; (define-key my-leader-map "fd" 'treemacs-delete)
-  ;; (define-key my-leader-map "feb" 'edit-bashrc)
-  ;; (define-key my-leader-map "fea" 'edit-awesomerc)
-  ;; (define-key my-leader-map "fee" 'edit-config)
-  ;; (define-key my-leader-map "feq" 'edit-qutebrowser)
-  ;; (define-key my-leader-map "fer" 'reload-config)
-  ;; (define-key my-leader-map "fev" 'edit-vimrc)
-  ;; (define-key my-leader-map "fey" 'edit-yas-config)
-  ;; (define-key my-leader-map "fq" 'treemacs-quit)
-  ;; (define-key my-leader-map "fs" 'treemacs-visit-node-horizontal-split)
-  ;; (define-key my-leader-map "fv" 'treemacs-visit-node-vertical-split)
-
-  ;; ;; binding ",g" for git
-  ;; (define-key my-leader-map "g" '("git-prefix"))
-  ;; (define-key my-leader-map "gb" 'magit-branch)
-  ;; (define-key my-leader-map "gB" 'magit-branch-create)
-  ;; (define-key my-leader-map "gc" 'magit-commit)
-  ;; (define-key my-leader-map "gg" 'magit-status)
-  ;; (define-key my-leader-map "gl" 'magit-log)
-  ;; (define-key my-leader-map "gs" 'git-gutter:stage-hunk)
-  ;; (define-key my-leader-map "gS" 'magit-stage)
-  ;; (define-key my-leader-map "gU" 'magit-unstage)
-  ;; (define-key my-leader-map "gj" 'git-gutter:next-diff)
-  ;; (define-key my-leader-map "gk" 'git-gutter:previous-diff)
-  ;; (define-key my-leader-map "gn" 'git-gutter:next-diff)
-  ;; (define-key my-leader-map "gp" 'git-gutter:previous-diff)
-  ;; (define-key my-leader-map "g>" 'magit-pull)
-  ;; (define-key my-leader-map "g<" 'magit-push)
-
-  ;; ;; binding ",h" for help
-  ;; (define-key my-leader-map "h" '("help-prefix"))
-  ;; (define-key my-leader-map "hm" 'describe-mode)
-  ;; (define-key my-leader-map "hf" 'describe-function)
-  ;; (define-key my-leader-map "hv" 'describe-variable)
-  ;; (define-key my-leader-map "hc" 'counsel-cheatsheets)
-
-  ;; ;; binding ",j" for jump
-  ;; (define-key my-leader-map "j" '("jump-prefix"))
-  ;; (define-key my-leader-map "jb" 'dumb-jump-back)
-  ;; (define-key my-leader-map "jd" 'dumb-jump-go)
-  ;; (define-key my-leader-map "jt" 'projectile-find-tag)
-  ;; (define-key my-leader-map "jj" 'evil-ace-jump-char-mode)
-  ;; (define-key my-leader-map "jw" 'evil-ace-jump-word-mode)
-  ;; (define-key my-leader-map "jl" 'evil-ace-jump-line-mode)
-
-
-  ;; ;; binding ",o" for org
-  ;; (define-key my-leader-map "o" '("org-prefix"))
-  ;; (define-key my-leader-map "occ" 'org-capture)
-  ;; (define-key my-leader-map "orc" 'org-roam-capture)
-  ;; (define-key my-leader-map "orf" 'org-roam-find-file)
-  ;; (define-key my-leader-map "ordc" 'org-roam-dailies-capture-today)
-  ;; (define-key my-leader-map "ordf" 'org-roam-dailies-find-today)
-  ;; (define-key my-leader-map "oci" 'org-clock-in)
-  ;; (define-key my-leader-map "oco" 'org-clock-out)
-
-  ;; binding ",p" for projects
-  ;; (define-key my-leader-map "p" '("projects-prefix"))
-  ;; (define-key my-leader-map "pA" 'projectile-add-known-project)
-  ;; (define-key my-leader-map "pa" 'counsel-projectile-org-agenda)
-  ;; (define-key my-leader-map "pc" 'counsel-projectile-org-capture)
-  ;; (define-key my-leader-map "pd" 'counsel-projectile-find-dir)
-  ;; (define-key my-leader-map "pm" 'projectile-compile-project)
-  ;; (define-key my-leader-map "pp" 'counsel-projectile-switch-project)
-  ;; (define-key my-leader-map "pf" 'counsel-projectile-find-file)
-  ;; (define-key my-leader-map "pq" 'projectile-kill-buffers)
-  ;; (define-key my-leader-map "pr" 'counsel-projectile-rg)
-  ;; (define-key my-leader-map "ps" 'projectile-run-shell)
-  ;; (define-key my-leader-map "ptt" 'projectile-find-tag)
-  ;; (define-key my-leader-map "ptr" 'projectile-tag-regenerate)
-  ;; (define-key my-leader-map "ptT" 'projectile-test-project)
-  ;; (define-key my-leader-map "ptf" 'projectile-find-test-file)
-  ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
-  ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
-
-  ;; binding ",r" for R programming language
-  (define-key my-leader-map "rpb" 'ess-r-devtools-build)
-  (define-key my-leader-map "rpc" 'ess-r-devtools-check-package)
-  (define-key my-leader-map "rpi" 'ess-r-devtools-install-package)
-  (define-key my-leader-map "rpl" 'ess-r-devtools-load-package)
-  (define-key my-leader-map "rpt" 'ess-r-devtools-test-package)
-  (define-key my-leader-map "rh" 'ess-display-help-on-object)
-  (define-key my-leader-map "ro" 'ess-rdired)
-  (define-key my-leader-map "rt" 'ess-eval-structure)
-  (define-key my-leader-map "ri" 'asb-ess-R-object-popup-str)
-  (define-key my-leader-map "rdi" 'asb-ess-R-object-popup-str)
-  (define-key my-leader-map "rdI" 'asb-ess-R-object-popup-interactive)
-  (define-key my-leader-map "rdc" 'asb-ess-R-object-popup-cls)
-  (define-key my-leader-map "rI" 'asb-ess-R-object-popup-interactive)
-  (define-key my-leader-map "rr" 'ess-eval-region-and-go)
-  (define-key my-leader-map "rq" 'ess-watch-quit)
-
-  ;; binding ",t" for tabs
-  ;; (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
-  ;; (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
-  ;; (define-key my-leader-map "tc" 'tab-bar-new-tab)
-  ;; (define-key my-leader-map "td" 'tab-bar-close-tab)
-  ;; (define-key my-leader-map "tl" 'tab-bar-switch-to-next-tab)
-  ;; (define-key my-leader-map "th" 'tab-bar-switch-to-prev-tab)
-  ;; (define-key my-leader-map "tr" 'tab-bar-rename-tab)
-  ;; (define-key my-leader-map "tL" 'tab-bar-move-tab)
-
-  (which-key-add-key-based-replacements ",a" "agenda")
-  (which-key-add-key-based-replacements ",b" "buffers")
-  (which-key-add-key-based-replacements ",d" "dumb")
-  (which-key-add-key-based-replacements ",e" "errors")
-  (which-key-add-key-based-replacements ",f" "files")
-  (which-key-add-key-based-replacements ",g" "git")
-  (which-key-add-key-based-replacements ",h" "help")
-  (which-key-add-key-based-replacements ",j" "jump")
-  (which-key-add-key-based-replacements ",p" "projects")
-  (which-key-add-key-based-replacements ",o" "org")
-  (which-key-add-key-based-replacements ",r" "R")
-  ;; (which-key-add-key-based-replacements ",t" "tabs")
-  (which-key-add-key-based-replacements ",x" "edit")
-  (which-key-add-key-based-replacements ",w" "windows")
-  (which-key-add-key-based-replacements ",y" "yas")
-
-  ;; binding ",w" for windows
-  ;; (define-key my-leader-map "wd" 'evil-window-delete)
-  ;; (define-key my-leader-map "wh" 'evil-window-left)
-  ;; (define-key my-leader-map "wn" 'evil-window-new)
-  ;; (define-key my-leader-map "wj" 'evil-window-down)
-  ;; (define-key my-leader-map "wk" 'evil-window-up)
-  ;; (define-key my-leader-map "wl" 'evil-window-right)
-  ;; (define-key my-leader-map "wm" 'maximize-window)
-  ;; (define-key my-leader-map "wM" 'minimize-window)
-  ;; (define-key my-leader-map "wu" 'winner-undo)
-  ;; (define-key my-leader-map "wv" 'evil-window-vsplit)
-  ;; (define-key my-leader-map "wr" 'winner-redo)
-  ;; (define-key my-leader-map "ws" 'evil-window-split)
-  ;; (define-key my-leader-map "wJ" 'evil-window-decrease-height)
-  ;; (define-key my-leader-map "wK" 'evil-window-increase-height)
-  ;; (define-key my-leader-map "wH" 'evil-window-decrease-width)
-  ;; (define-key my-leader-map "wL" 'evil-window-increase-width)
-  ;; (define-key my-leader-map "w-" 'evil-window-split)
-  ;; (define-key my-leader-map "w|" 'evil-window-vsplit)
-  ;; (define-key my-leader-map "w=" 'balance-windows)
-
-  ;; binding ",x" for edit commands
-  ;; (define-key my-leader-map "x" '("edit-prefix"))
-  ;; (define-key my-leader-map "xc" 'evilnc-comment-or-uncomment-lines)
-  ;; (define-key my-leader-map "xi" 'text-scale-increase)
-  ;; (define-key my-leader-map "xd" 'text-scale-decrease)
-
-  ;; binding ",y" for yasnippets
-  (define-key my-leader-map "y" '("yas-prefix"))
-  (define-key my-leader-map "yy" 'yas-insert-snippet)
   )
 (use-package winner
   :straight t
@@ -1566,18 +2114,54 @@
 (use-package visual-regexp-steroids
   :straight t
   )
+;; (use-package weatherline-mode
+;;   :straight (:host github :repo "aaron-em/weatherline-mode.el")
+;;   )
+
+;; (add-hook 'after-init-hook 'org-agenda-list)
+
+;; (add-hook 'after-init-hook '(lambda () (org-agenda-list 1)))
+
+;; (setq inhibit-splash-screen t)
+;; (org-agenda-list)
+;; (delete-other-windows)
+
+
+
+
+(load-file "~/.emacs.d/personal-configs.el")
+
+(eval-after-load
+'company
+'(add-to-list 'company-backends #'company-omnisharp))
+
+;; (setq org-agenda-files (append org-agenda-files (mapcar (lambda (s) (concat s "todo.org")) projectile-known-projects)))
+;; (setq org-agenda-files (remove-duplicates (append org-agenda-files projectile-known-projects)))
+(setq org-agenda-files projectile-known-projects)
+(setq counsel-projectile-org-capture-templates '(("t" "[${name}] Todos" entry
+						  (file+headline "${root}/todo.org" "Todos")
+						  "*** TODO %?\n%u\n%a")))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(helm-ag-base-command "rg --no-heading")
+ '(helm-ag-success-exit-status '(0 2))
+ '(helm-minibuffer-history-key "M-p")
  '(safe-local-variable-values '((eval hs-minor-mode t))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(tab-bar ((t (:background "dim gray" :foreground "#1d2021" :box nil))))
+ '(tab-bar-tab ((t (:background "#100011" :foreground "#c5d4dd" :box nil)))))
+
+  
+
+
 ;; Local Variables:
 ;; mode: lisp-interaction
 ;; eval: (hs-minor-mode t)
