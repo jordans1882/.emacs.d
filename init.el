@@ -46,6 +46,11 @@
   :straight t
   :after counsel
   :init (all-the-icons-ivy-rich-mode 1))
+;; (use-package apheleia
+;;   :straight t
+;;   :config
+;;   (apheleia-global-mode +1)
+;;   )
 (use-package auctex-latexmk
   :straight t
   :config
@@ -157,6 +162,7 @@
 (use-package company
   :straight t
   :config
+  (add-hook 'shell-mode-hook 'company-mode)
   ;;(add-to-list 'auto-mode-alist '("\\.h\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.hpp\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.cpp\\'" . company-mode))
@@ -271,6 +277,9 @@
 ;;   ;; (setq corfu-cycle t)
 ;; )
 (use-package counsel
+  :straight t
+  )
+(use-package cuda-mode
   :straight t
   )
 (use-package counsel-org-clock
@@ -535,6 +544,21 @@
     (next-line)
   )
 
+  (setq python-shell-interpreter "ipython")
+  (setq python-shell-interpreter-args "--simple-prompt -i")
+
+
+  (defun bg-elpy-shell-send-statement-and-step (&optional arg)
+    (interactive "P")
+    ;; Force the process to start completely by sitting a bit to avoid this warning:
+    ;;
+    ;;   Warning (python): Your ‘python-shell-interpreter’ doesn’t seem to support readline, yet ‘python-shell-completion-native-enable’ was t and "python" is not part of the ‘python-shell-completion-native-disabled-interpreters’ list.  Native completions have been disabled locally.
+    ;;
+    ;; Refer to https://github.com/jorgenschaefer/elpy/issues/887
+    ;;
+    (elpy-shell-get-or-create-process 0.001)
+    (elpy-shell-send-statement-and-step arg))
+
   ;;;;;;;;;;;;;;;;;;;;;;;
   ;; Project Templates ;;
   ;;;;;;;;;;;;;;;;;;;;;;;
@@ -702,6 +726,9 @@
 (use-package forge
   :straight t
   )
+(use-package format-all
+  :straight t
+  )
 (use-package general
   :straight t
   :after (:all which-key hydra org-super-agenda)
@@ -744,15 +771,7 @@
      "M-C-k" 'evil-window-increase-height
      "M-C-h" 'evil-window-decrease-width
      "M-C-l" 'evil-window-increase-width
-     "M-l"
-"M-l"
-
-"M-l"
-
-"M-l"
-
-"M-l"
-'evil-window-right
+     "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
      "M-h" 'evil-window-left
@@ -841,21 +860,53 @@
   )
 
 
+  ;; Define R modes
+  (general-define-key
+     :states '(normal visual)
+     :keymaps '(python-mode-map)
+     ;; General
+     "M-<RET>" 'bg-elpy-shell-send-statement-and-step
 
-  ;; Define python modes
+     ",l" '(:ignore t :which-key "Python")
+     ",la" '(elpy-goto-assignment :which-key "goto-Assignment")
+     ",lc" '(elpy-shell-send-defclass-and-step :which-key "send defClass")
+     ",ld" '(elpy-goto-definition :which-key "goto-Definition")
+     ",lf" '(elpy-format-code :which-key "Format")
+     ;; ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
+     ;; ",ldc" '(asb-ess-R-object-popup-cls :which-key "class")
+     ",lh" '(elpy-doc :which-key "Help")
+     ",lk" '(elpy-shell-kill :which-key "Kill")
+     ;; ",li" '(asb-ess-R-object-popup-str :which-key "inspect")
+     ;; ",lI" '(ess-r-devtools-install-package :which-key "install package")
+     ;; ",lL" '(ess-r-devtools-install-package :which-key "load package")
+     ;; ",lo" '(ess-rdired :which-key "object")
+     ;; ",lp" '(:ignore t :which-key "project")
+     ;; ",lpb" '(ess-r-devtools-build :which-key "build")
+     ;; ",lpc" '(ess-r-devtools-check-package :which-key "check")
+     ;; ",lpt" '(ess-r-devtools-test-package :which-key "test")
+     ;; ",lq" '(ess-watch-quit :which-key "quit")
+     ;; ",lt" '(ess-eval-structure :which-key "structure")
+     )
+
+
+
+
+
+  ;; Define R modes
   (general-define-key
      :states '(normal visual)
      :keymaps '(ess-r-mode-map)
 
      ;; General
      "M-<RET>" 'ess-eval-region-or-line-and-step
+     "<C-M-return>" 'ess-eval-function-or-paragraph-and-step
 
      ",l" '(:ignore t :which-key "R")
      ",ldi" '(asb-ess-R-object-popup-str :which-key "inspect")
      ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
      ",ldc" '(asb-ess-R-object-popup-cls :which-key "class")
-     ",lh" 'ess-eval-region-or-line-and-step
-     ",li" '(asb-ess-R-object-popup-str :which-key "inspect")
+     ",lh" '(ess-display-help-on-object :which-key "help")
+     ",li" '(asb-ess-R-object-popup-str :which-key "introspect")
      ",lI" '(ess-r-devtools-install-package :which-key "install package")
      ",lL" '(ess-r-devtools-install-package :which-key "load package")
      ",lo" '(ess-rdired :which-key "object")
@@ -876,6 +927,7 @@
 
      ;; General
      "M-o" 'org-open-at-point
+
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
@@ -890,7 +942,9 @@
      :keymaps '(python-mode-map)
 
      ;; General
-     "M-<RET>" 'elpy-shell-send-statement-and-step)
+     "M-<RET>" 'elpy-shell-send-statement-and-step
+
+     )
 
   (general-define-key
      :states '(normal visual)
@@ -1054,22 +1108,22 @@
 
    ;; R language bindings
    ;; TODO: Fold R-bindings into something more general
-   "r" '(:ignore t :which-key "R")
-   "rI" '(ess-r-devtools-install-package :which-key "install package")
-   "rL" '(ess-r-devtools-install-package :which-key "load package")
-   "rp" '(:ignore t :which-key "project")
-   "rpb" '(ess-r-devtools-build :which-key "build")
-   "rpc" '(ess-r-devtools-check-package :which-key "check")
-   "rpt" '(ess-r-devtools-test-package :which-key "test")
-   "rh" '(ess-display-help-on-object :which-key "help")
-   "ro" '(ess-rdired :which-key "object")
-   "rt" '(ess-eval-structure :which-key "structure")
-   "ri" '(asb-ess-R-object-popup-str :which-key "inspect")
-   "rdi" '(asb-ess-R-object-popup-str :which-key "inspect")
-   "rdI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
-   "rdc" '(asb-ess-R-object-popup-cls :which-key "class")
-   "rr" '(ess-eval-region-and-go :which-key "eval")
-   "rq" '(ess-watch-quit :which-key "quit")
+   ;; "r" '(:ignore t :which-key "R")
+   ;; "rI" '(ess-r-devtools-install-package :which-key "install package")
+   ;; "rL" '(ess-r-devtools-install-package :which-key "load package")
+   ;; "rp" '(:ignore t :which-key "project")
+   ;; "rpb" '(ess-r-devtools-build :which-key "build")
+   ;; "rpc" '(ess-r-devtools-check-package :which-key "check")
+   ;; "rpt" '(ess-r-devtools-test-package :which-key "test")
+   ;; "rh" '(ess-display-help-on-object :which-key "help")
+   ;; "ro" '(ess-rdired :which-key "object")
+   ;; "rt" '(ess-eval-structure :which-key "structure")
+   ;; "ri" '(asb-ess-R-object-popup-str :which-key "inspect")
+   ;; "rdi" '(asb-ess-R-object-popup-str :which-key "inspect")
+   ;; "rdI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
+   ;; "rdc" '(asb-ess-R-object-popup-cls :which-key "class")
+   ;; "rr" '(ess-eval-region-and-go :which-key "eval")
+   ;; "rq" '(ess-watch-quit :which-key "quit")
 
    ;; Todos
    "t" '(:ignore t :which-key "todos")
