@@ -1935,12 +1935,14 @@
 ;;   )
 (use-package perspective
   :straight t
-  :init
+  :after projectile counsel-projectile
+  :config
   (persp-mode)
   (global-gumshoe-persp-mode 1)
   )
 (use-package persp-projectile
   :straight t
+  :after perspective, projectile, counsel-projectile
   )
 (use-package pdf-tools
   :straight t
@@ -2048,7 +2050,7 @@
   )
 (use-package treemacs
   :straight t
-  :defer t
+  :after perspective
   :init
   (defvar treemacs-no-load-time-warnings t)
   (with-eval-after-load 'winum
@@ -2126,6 +2128,7 @@
   )
 (use-package treemacs-perspective
   :straight t
+  :after perspective, treemacs
   :config
   (treemacs-set-scope-type 'Perspectives)
   )
