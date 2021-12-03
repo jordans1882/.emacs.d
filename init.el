@@ -23,6 +23,16 @@
 
 ;; Use packages with configs
 
+
+;; (defun get-linux-os-name ()
+;;   "Get the name of the linux operating system"
+;;   (interactive)
+;;   (replace-regexp-in-string
+;;    "\n$" ""
+;;    (shell-command-to-string
+;;     "cat /etc/os-release | grep 'NAME' | head -n 1 | cut -c7- | sed 's/[/\"]//'")))
+;; 
+
 (use-package ace-jump-mode
   :straight t
   )
@@ -255,24 +265,24 @@
   ;; ;;;; 4. locate-dominating-file
   ;; ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
   )
-
 ;; (use-package corfu
+;;   :disabled
 ;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
 ;;   ;; :bind (:map corfu-map
 ;;   ;;        ("TAB" . corfu-next)
 ;;   ;;        ("S-TAB" . corfu-previous))
-;; 
+;;
 ;;   ;; You may want to enable Corfu only for certain modes.
 ;;   ;; :hook ((prog-mode . corfu-mode)
 ;;   ;;        (shell-mode . corfu-mode)
 ;;   ;;        (eshell-mode . corfu-mode))
-;; 
+;;
 ;;   :config
-;; 
+;;
 ;;   ;; Alternatively enable Corfu globally.
 ;;   ;; This is recommended if Corfu is used with dabbrev.
 ;;   (corfu-global-mode)
-;; 
+;;
 ;;   ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
 ;;   ;; (setq corfu-cycle t)
 ;; )
@@ -327,6 +337,7 @@
   )
 ;; (use-package dimmer
 ;;   :straight t
+;;   :disabled
 ;;   :config
 ;;   (dimmer-configure-which-key)
 ;;   (dimmer-configure-helm)
@@ -381,16 +392,14 @@
 ;; (use-package eaf
 ;;   :straight t
 ;;   :config
-;;   :load-path "~/.emacs.d/straight/repos/eaf" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
-;;
+;;   :load-path "/usr/share/emacs/site-lisp/eaf"
+;;   ; :load-path "~/.emacs.d/straight/repos/eaf" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
 ;;   )
 ;; (require 'eaf-browser)
 ;; (require 'eaf-pdf-viewer)
-
 (use-package epc
   :straight t
   )
-
 (use-package eglot
   :straight t
   )
@@ -480,8 +489,8 @@
   (menu-bar-mode -1)                                     ;; Remove top Menu
   (tool-bar-mode -1)                                     ;; Remove top toolbar
   (scroll-bar-mode -1)                                   ;; Remove scrollbar
-  (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
-  (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
+  ;; (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
+  ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
 
 
@@ -505,7 +514,7 @@
   (defun sunny ()
     "Set theme to sunny"
     (interactive)
-    (counsel-load-theme-action "doom-nord-light"))
+    (counsel-load-theme-action "doom-homage-light"))
   (defun dusk ()
     "Set theme to dusk"
     (interactive)
@@ -1094,7 +1103,8 @@
    "pm" '(projectile-compile-project :which-key "compile")
    "pp" '(projectile-persp-switch-project :which-key "switch")
    "pf" '(counsel-projectile-find-file :which-key "file")
-   "pq" '(projectile-kill-buffers :which-key "quit")
+   ;; "pq" '(projectile-kill-buffers :which-key "quit")
+   "pq" '(persp-kill :which-key "quit")
    "pr" '(counsel-projectile-rg :which-key "ripgrep")
    "ps" '(projectile-run-shell :which-key "shell")
    "pt" '(:ignore t :which-key "test")
@@ -1201,6 +1211,9 @@
    "zm" '(origami-close-all-nodes :which-key "close all folds")
    )
   )
+(use-package git-link
+  :straight t
+  )
 (use-package git-messenger
   :straight t
   )
@@ -1219,17 +1232,16 @@
   :straight t
   )
 (use-package gumshoe
+  ;; :disabled
   :straight (gumshoe :type git
                      :host github
                      :repo "Overdr0ne/gumshoe"
                      :branch "master")
+  :after perspective persp-projectile
   :config
-  ;; The minor mode must be enabled to begin tracking
   (global-gumshoe-mode 1)
-  ;; Similarly for the perspective-local gumshoe:
-  ;; (global-gumshoe-persp-mode 1)
-  ;; Similarly for the buffer-local gumshoe:
-  (global-gumshoe-buf-mode 1)
+  (global-gumshoe-persp-mode +1)
+  (setf gumshoe-slot-schema '(perspective time buffer position line))
   ;; define a command for autocompletion of the gumshoe--global log if you’d like:
   (defun consult-gumshoe-global ()
     "List global gumshoes in consult"
@@ -1246,6 +1258,10 @@
     (interactive)
     (consult-global-mark (ring-elements (oref gumshoe--buf-backlog log))))
   )
+;; (use-package hideshowvis ;; Would like this to work with origami-mode...
+;;   :straight t
+;;   :disabled
+;; )
 (use-package hl-todo
   :straight t
   :config
@@ -1303,6 +1319,9 @@
 (use-package imenu-list
   :straight t
   )
+;; (use-package interaction-log
+;;   :straight t
+;;   )
 (use-package irony
   :straight t
   :config
@@ -1362,10 +1381,10 @@
   :commands lsp
   :config
   (add-to-list 'lsp-language-id-configuration '(csharp-mode . "csharp"))
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/bin/omnisharp" "-lsp"))
-                    :major-modes '(csharp-mode)
-                    :server-id 'csharp))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/bin/omnisharp" "-lsp"))
+  ;;                   :major-modes '(csharp-mode)
+  ;;                   :server-id 'csharp))
   (add-hook 'ess-r-mode-hook 'lsp-mode)
   (add-hook 'ess-r-mode-hook 'lsp)
 )
@@ -1453,6 +1472,10 @@
   :straight t
   :config
   (nyan-mode 1))
+
+(use-package olivetti
+  :straight t
+  )
 (use-package ob-mermaid
   :straight t
   :config
@@ -1937,7 +1960,6 @@
   :straight t
   :init
   (persp-mode)
-  (global-gumshoe-persp-mode 1)
   )
 (use-package persp-projectile
   :straight t
@@ -2118,20 +2140,21 @@
         ("C-x t M-t" . treemacs-find-tag)))
 (use-package treemacs-evil
   :straight t
-  :after treemacs evil
+  :after (:all treemacs evil)
   )
 (use-package treemacs-projectile
   :straight t
-  :after treemacs projectile
+  :after (:all treemacs projectile)
   )
 (use-package treemacs-perspective
   :straight t
+  :after (:all treemacs perspective)
   :config
   (treemacs-set-scope-type 'Perspectives)
   )
 (use-package treemacs-magit
   :straight t
-  :after treemacs magit
+  :after (:all treemacs magit)
   )
 (use-package tree-sitter
   :straight t
@@ -2181,13 +2204,11 @@
 ;; (delete-other-windows)
 
 
-
-
 (load-file "~/.emacs.d/personal-configs.el")
 
-(eval-after-load
-'company
-'(add-to-list 'company-backends #'company-omnisharp))
+;; (eval-after-load
+;; 'company
+;; '(add-to-list 'company-backends #'company-omnisharp))
 
 ;; (setq org-agenda-files (append org-agenda-files (mapcar (lambda (s) (concat s "todo.org")) projectile-known-projects)))
 ;; (setq org-agenda-files (remove-duplicates (append org-agenda-files projectile-known-projects)))
@@ -2212,8 +2233,6 @@
  ;; If there is more than one, they won't work right.
  '(tab-bar ((t (:background "dim gray" :foreground "#1d2021" :box nil))))
  '(tab-bar-tab ((t (:background "#100011" :foreground "#c5d4dd" :box nil)))))
-
-  
 
 
 ;; Local Variables:
