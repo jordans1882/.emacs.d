@@ -1958,11 +1958,13 @@
 ;;   )
 (use-package perspective
   :straight t
-  :init
+  :after projectile counsel-projectile
+  :config
   (persp-mode)
   )
 (use-package persp-projectile
   :straight t
+  :after perspective, projectile, counsel-projectile
   )
 (use-package pdf-tools
   :straight t
@@ -2070,7 +2072,7 @@
   )
 (use-package treemacs
   :straight t
-  :defer t
+  :after perspective
   :init
   (defvar treemacs-no-load-time-warnings t)
   (with-eval-after-load 'winum
