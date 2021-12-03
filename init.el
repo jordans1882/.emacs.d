@@ -20,6 +20,7 @@
 
 ;; Integrate straight.el with use-package
 (straight-use-package 'use-package)
+(eval-when-compile (require 'use-package))
 
 ;; Use packages with configs
 
@@ -492,8 +493,6 @@
   ;; (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
   ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
-
-
   ;; Functionality
   (setq backup-directory-alist `(("." . "~/.emacs.d/.saves"))) ;; Set backups directory
   (setq auto-save-file-name-transforms                   ;; Set autosave directory
@@ -507,14 +506,18 @@
     "Set theme to dawn"
     (interactive)
     (counsel-load-theme-action "doom-gruvbox-light"))
+  (defun morning ()
+    "Set theme to morning"
+    (interactive)
+    (counsel-load-theme-action "doom-solarized-light"))
   (defun day ()
     "Set theme to day"
     (interactive)
-    (counsel-load-theme-action "doom-solarized-light"))
+    (counsel-load-theme-action "tsdh-light"))
   (defun sunny ()
     "Set theme to sunny"
     (interactive)
-    (counsel-load-theme-action "doom-homage-light"))
+    (counsel-load-theme-action "doom-homage-white"))
   (defun dusk ()
     "Set theme to dusk"
     (interactive)
@@ -751,6 +754,7 @@
 			  :prefix ","
 			  :global-prefix "C-,"
 			  )
+
 
   (general-define-key
      :states '(normal)
@@ -1137,20 +1141,21 @@
 
    ;; Todos
    "t" '(:ignore t :which-key "todos")
-   "tt" '(ivy-magit-todos :which-key "todos")
+   "tt" '(ivy-magit-todos :which-key "goto")
 
    ;; Tabs
    ;; TODO: Create tab bindings
    ;; TODO: Add tab bindings to be like window bindings in awesome
-   ;; "<TAB><TAB>" '(tab-bar-select-tab-by-name :which-key "tabs")
-   ;; (define-key my-leader-map "tt" 'tab-bar-select-tab-by-name)
-   ;; (define-key my-leader-map "tT" 'toggle-tab-bar-mode-from-frame)
    ;; (define-key my-leader-map "tc" 'tab-bar-new-tab)
-   ;; (define-key my-leader-map "td" 'tab-bar-close-tab)
-   ;; (define-key my-leader-map "tl" 'tab-bar-switch-to-next-tab)
-   ;; (define-key my-leader-map "th" 'tab-bar-switch-to-prev-tab)
-   ;; (define-key my-leader-map "tr" 'tab-bar-rename-tab)
-   ;; (define-key my-leader-map "tL" 'tab-bar-move-tab)
+   "TAB" '(:ignore t :which-key "Tabs")
+   "TAB TAB" '(tab-bar-select-tab-by-name :which-key "Goto")
+   "TAB T" '(toggle-tab-bar-mode-from-frame :which-key "toggle from frame")
+   "TAB d" '(tab-bar-close-tab :which-key "Delete")
+   "TAB c" '(tab-bar-close-tab :which-key "Create")
+   "TAB l" '(tab-bar-switch-to-next-tab :which-key "Next")
+   "TAB h" '(tab-bar-switch-to-prev-tab :which-key "Previous")
+   "TAB r" '(tab-bar-rename-tab :which-key "Rename")
+   "TAB L" '(tab-bar-move-tab :which-key "Move Right")
 
    ;; UI
    "u" '(:ignore t :which-key "ui")
@@ -1210,6 +1215,10 @@
    "zr" '(origami-open-all-nodes :which-key "open all folds")
    "zm" '(origami-close-all-nodes :which-key "close all folds")
    )
+
+  (misenplace/leader-keys
+     :keymaps '(global-map evil-normal-state-map pdf-view-mode-map))
+
   )
 (use-package git-link
   :straight t
@@ -1968,6 +1977,7 @@
   )
 (use-package pdf-tools
   :straight t
+  :magic ("%PDF" . pdf-view-mode)
   :config
   (evil-make-overriding-map pdf-view-mode-map 'normal)
   (evil-define-key 'normal pdf-view-mode-map
@@ -1976,6 +1986,7 @@
   "k" (lambda () (interactive) (pdf-view-previous-line-or-previous-page 5))
   "l" 'image-forward-hscroll
   "G" 'pdf-view-last-page)
+
   ;; (define-key doc-view-mode-map (kbd "j") 'doc-view-next-line-or-next-page)
   ;; (define-key doc-view-mode-map (kbd "k") 'doc-view-previous-line-or-previous-page)
   ;; (define-key doc-view-mode-map (kbd "h") 'image-backward-hscroll)
