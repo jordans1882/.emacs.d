@@ -202,6 +202,15 @@
   ;; Tramp config
   (setq tramp-default-method "ssh")
 
+  ;; define function to shutdown emacs server instance
+  (defun server-shutdown ()
+    "Save buffers, Quit, and Shutdown (kill) server"
+    (interactive)
+    (save-some-buffers)
+    (kill-emacs)
+    )
+
+
   )
 (use-package ace-jump-mode
   :straight t
@@ -499,8 +508,7 @@
   (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
-
-
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
   )
 (use-package deft
   :straight t
@@ -811,6 +819,7 @@
      "C-t" 'tab-bar-new-tab
      "C-i" 'gumshoe-persp-backtrack-forward
      "C-<SPACE>" 'send-line-to-target-process
+     "C-<return>" 'send-line-to-target-process
      "C-<tab>" 'tab-bar-switch-to-next-tab
      [(control shift iso-lefttab)] 'tab-bar-switch-to-prev-tab
      "ESC ESC ESC" 'evil-normal-state
