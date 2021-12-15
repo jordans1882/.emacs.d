@@ -1,4 +1,5 @@
 ;; Misenplace:
+
 ;; My emacs config
 
 ;; (require 'package)
@@ -24,16 +25,184 @@
 
 ;; Use packages with configs
 
+(use-package emacs
+  :config
+  ;; Appearance
+  (set-face-attribute 'default nil :height 170)          ;; Font size
+  (menu-bar-mode -1)                                     ;; Remove top Menu
+  (tool-bar-mode -1)                                     ;; Remove top toolbar
+  (scroll-bar-mode -1)                                   ;; Remove scrollbar
+  ;; (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
+  ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
-;; (defun get-linux-os-name ()
-;;   "Get the name of the linux operating system"
-;;   (interactive)
-;;   (replace-regexp-in-string
-;;    "\n$" ""
-;;    (shell-command-to-string
-;;     "cat /etc/os-release | grep 'NAME' | head -n 1 | cut -c7- | sed 's/[/\"]//'")))
-;; 
+  ;; Functionality
+  (setq backup-directory-alist `(("." . "~/.emacs.d/.saves"))) ;; Set backups directory
+  (setq auto-save-file-name-transforms                   ;; Set autosave directory
+  `((".*" "~/.emacs.d/auto-saves/" t)))
 
+  (setq tab-bar-select-tab-modifiers "meta")
+
+
+  ;; Utility funs
+  (defun dawn ()
+    "Set theme to dawn"
+    (interactive)
+    (counsel-load-theme-action "doom-gruvbox-light"))
+  (defun morning ()
+    "Set theme to morning"
+    (interactive)
+    (counsel-load-theme-action "doom-solarized-light"))
+  (defun day ()
+    "Set theme to day"
+    (interactive)
+    (counsel-load-theme-action "tsdh-light"))
+  (defun sunny ()
+    "Set theme to sunny"
+    (interactive)
+    (counsel-load-theme-action "doom-homage-white"))
+  (defun dusk ()
+    "Set theme to dusk"
+    (interactive)
+    (counsel-load-theme-action "doom-nova"))
+  (defun evening ()
+    "Set theme to evening"
+    (interactive)
+    (counsel-load-theme-action "doom-gruvbox"))
+  (defun late-night ()
+    "Set theme to late-night"
+    (interactive)
+    (counsel-load-theme-action "doom-Iosvkem"))
+
+
+  (defun set-target-buffer (buffer)
+    "Switch to BUFFER.
+ BUFFER may be a string or nil."
+    (setq target-buffer buffer))
+
+  (defun ivy-set-process-target ()
+    "Switch to another buffer."
+    (interactive)
+    (ivy-read "Switch to buffer: " #'internal-complete-buffer
+	      :keymap ivy-switch-buffer-map
+	      :preselect (buffer-name (other-buffer (current-buffer)))
+	      :action #'set-target-buffer
+	      :matcher #'ivy--switch-buffer-matcher
+	      :caller 'ivy-switch-buffer))
+
+  (defun send-line-to-target-process ()
+    "Send a line to process defined by target-buffer."
+    (interactive)
+    (setq proc (get-process target-buffer))
+    (setq com (concat (buffer-substring (point-at-bol) (point-at-eol)) "\n"))
+    (process-send-string target-buffer com)
+    (next-line)
+  )
+
+  (setq python-shell-interpreter "ipython")
+  (setq python-shell-interpreter-args "--simple-prompt -i")
+
+
+  (defun bg-elpy-shell-send-statement-and-step (&optional arg)
+    (interactive "P")
+    ;; Force the process to start completely by sitting a bit to avoid this warning:
+    ;;
+    ;;   Warning (python): Your ‘python-shell-interpreter’ doesn’t seem to support readline, yet ‘python-shell-completion-native-enable’ was t and "python" is not part of the ‘python-shell-completion-native-disabled-interpreters’ list.  Native completions have been disabled locally.
+    ;;
+    ;; Refer to https://github.com/jorgenschaefer/elpy/issues/887
+    ;;
+    (elpy-shell-get-or-create-process 0.001)
+    (elpy-shell-send-statement-and-step arg))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Project Templates ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Python Project Template
+   (defun make-python-project ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (setq python-template-repo "git@github.com:jordans1882/template-python.git")
+     (setq proj-name (read-string "Enter your project name:"))
+     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+     ;; TODO: Add check if project already exists for make-python-project
+     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
+     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+     (shell-command-to-string clone-command)
+     (shell-command-to-string rm-git-command)
+     (magit-init proj-dir) ;; use hub for this?
+     (projectile-add-known-project proj-dir)
+     )
+
+   (defun select-tab-first ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 1))
+   (defun select-tab-second ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 2))
+   (defun select-tab-third ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 3))
+   (defun select-tab-fourth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 4))
+   (defun select-tab-fifth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 5))
+   (defun select-tab-sixth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 6))
+   (defun select-tab-seventh ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 7))
+   (defun select-tab-eighth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 8))
+   (defun select-tab-ninth ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (tab-bar-select-tab 9))
+
+   (defun make-r-project ()
+     "Prompt user to enter a directory name and create project."
+     (interactive)
+     (setq python-template-repo "git@github.com:jordans1882/templater.git")
+     (setq proj-name (read-string "Enter your project name:"))
+     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+     ;; TODO: Add check if project already exists for make-python-project
+     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
+     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+     (shell-command-to-string clone-command)
+     (shell-command-to-string rm-git-command)
+     (magit-init proj-dir) ;; use hub for this?
+     (projectile-add-known-project proj-dir)
+     )
+
+
+   (defun get-linux-os-name ()
+     "Get the name of the linux operating system"
+     (interactive)
+     (replace-regexp-in-string
+      "\n$" ""
+      (shell-command-to-string
+       "cat /etc/os-release | grep 'NAME' | head -n 1 | cut -c7- | sed 's/[/\"]//'")))
+
+  (add-hook 'lisp-interaction-mode-hook 'company-mode)
+
+  ;; Filetype modes
+  (add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-interaction-mode))
+
+  ;; Tramp config
+  (setq tramp-default-method "ssh")
+
+  )
 (use-package ace-jump-mode
   :straight t
   )
@@ -290,6 +459,9 @@
 (use-package counsel
   :straight t
   )
+(use-package counsel-tramp
+  :straight t
+  )
 (use-package cuda-mode
   :straight t
   )
@@ -483,173 +655,6 @@
    (interactive "sR function to execute: ")
    (asb-ess-R-object-popup r-func))
 )
-(use-package emacs
-  :config
-  ;; Appearance
-  (set-face-attribute 'default nil :height 170)          ;; Font size
-  (menu-bar-mode -1)                                     ;; Remove top Menu
-  (tool-bar-mode -1)                                     ;; Remove top toolbar
-  (scroll-bar-mode -1)                                   ;; Remove scrollbar
-  ;; (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
-  ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
-
-  ;; Functionality
-  (setq backup-directory-alist `(("." . "~/.emacs.d/.saves"))) ;; Set backups directory
-  (setq auto-save-file-name-transforms                   ;; Set autosave directory
-  `((".*" "~/.emacs.d/auto-saves/" t)))
-
-  (setq tab-bar-select-tab-modifiers "meta")
-
-
-  ;; Utility funs
-  (defun dawn ()
-    "Set theme to dawn"
-    (interactive)
-    (counsel-load-theme-action "doom-gruvbox-light"))
-  (defun morning ()
-    "Set theme to morning"
-    (interactive)
-    (counsel-load-theme-action "doom-solarized-light"))
-  (defun day ()
-    "Set theme to day"
-    (interactive)
-    (counsel-load-theme-action "tsdh-light"))
-  (defun sunny ()
-    "Set theme to sunny"
-    (interactive)
-    (counsel-load-theme-action "doom-homage-white"))
-  (defun dusk ()
-    "Set theme to dusk"
-    (interactive)
-    (counsel-load-theme-action "doom-nova"))
-  (defun evening ()
-    "Set theme to evening"
-    (interactive)
-    (counsel-load-theme-action "doom-gruvbox"))
-  (defun late-night ()
-    "Set theme to late-night"
-    (interactive)
-    (counsel-load-theme-action "doom-Iosvkem"))
-
-
-  (defun set-target-buffer (buffer)
-    "Switch to BUFFER.
- BUFFER may be a string or nil."
-    (setq target-buffer buffer))
-
-  (defun ivy-set-process-target ()
-    "Switch to another buffer."
-    (interactive)
-    (ivy-read "Switch to buffer: " #'internal-complete-buffer
-	      :keymap ivy-switch-buffer-map
-	      :preselect (buffer-name (other-buffer (current-buffer)))
-	      :action #'set-target-buffer
-	      :matcher #'ivy--switch-buffer-matcher
-	      :caller 'ivy-switch-buffer))
-
-  (defun send-line-to-target-process ()
-    "Send a line to process defined by target-buffer."
-    (interactive)
-    (setq proc (get-process target-buffer))
-    (setq com (concat (buffer-substring (point-at-bol) (point-at-eol)) "\n"))
-    (process-send-string target-buffer com)
-    (next-line)
-  )
-
-  (setq python-shell-interpreter "ipython")
-  (setq python-shell-interpreter-args "--simple-prompt -i")
-
-
-  (defun bg-elpy-shell-send-statement-and-step (&optional arg)
-    (interactive "P")
-    ;; Force the process to start completely by sitting a bit to avoid this warning:
-    ;;
-    ;;   Warning (python): Your ‘python-shell-interpreter’ doesn’t seem to support readline, yet ‘python-shell-completion-native-enable’ was t and "python" is not part of the ‘python-shell-completion-native-disabled-interpreters’ list.  Native completions have been disabled locally.
-    ;;
-    ;; Refer to https://github.com/jorgenschaefer/elpy/issues/887
-    ;;
-    (elpy-shell-get-or-create-process 0.001)
-    (elpy-shell-send-statement-and-step arg))
-
-  ;;;;;;;;;;;;;;;;;;;;;;;
-  ;; Project Templates ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;; Python Project Template
-   (defun make-python-project ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (setq python-template-repo "git@github.com:jordans1882/template-python.git")
-     (setq proj-name (read-string "Enter your project name:"))
-     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
-     ;; TODO: Add check if project already exists for make-python-project
-     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
-     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
-     (shell-command-to-string clone-command)
-     (shell-command-to-string rm-git-command)
-     (magit-init proj-dir) ;; use hub for this?
-     (projectile-add-known-project proj-dir)
-     )
-
-   (defun select-tab-first ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 1))
-   (defun select-tab-second ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 2))
-   (defun select-tab-third ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 3))
-   (defun select-tab-fourth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 4))
-   (defun select-tab-fifth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 5))
-   (defun select-tab-sixth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 6))
-   (defun select-tab-seventh ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 7))
-   (defun select-tab-eighth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 8))
-   (defun select-tab-ninth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 9))
-
-   (defun make-r-project ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (setq python-template-repo "git@github.com:jordans1882/templater.git")
-     (setq proj-name (read-string "Enter your project name:"))
-     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
-     ;; TODO: Add check if project already exists for make-python-project
-     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
-     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
-     (shell-command-to-string clone-command)
-     (shell-command-to-string rm-git-command)
-     (magit-init proj-dir) ;; use hub for this?
-     (projectile-add-known-project proj-dir)
-     )
-
-
-
-
-  (add-hook 'lisp-interaction-mode-hook 'company-mode)
-
-
-  )
 (use-package native-complete
   :straight (:host github :repo "CeleritasCelery/emacs-native-shell-complete")
   :config
@@ -768,6 +773,7 @@
   (general-define-key
      :states '(normal visual insert)
      :keymaps '(global-map evil-normal-state-map)
+     ;; "C-c C-c" 'evilnc-comment-or-uncomment-lines ;; TODO: find a new bind for commenting
      "C-=" 'text-scale-increase
      "C--" 'text-scale-decrease
      "C-w" 'tab-bar-close-tab
@@ -987,7 +993,7 @@
    "ag" '(:ignore t :which-key "goto")
    "agp" '(org-projectile-goto-location-for-project :which-key "project org")
    "at" '(org-todo :which-key "todo")
-   "ap" '(org-todo :which-key "pomodoro")
+   "ap" '(org-pomodoro :which-key "pomodoro")
 
    ;; Buffers
    "b" '(:ignore t :which-key "buffers")
@@ -1007,12 +1013,6 @@
    "db" '(dumb-jump-back :which-key "back")
    "do" '(dumb-jump-go-other-window :which-key "go other")
    "dq" '(dumb-jump-quick-look :which-key "quick-look")
-
-
-   ;; TODO: add comment line key-binding
-   ;; "e" '(:ignore t :which-key "edit")
-   ;; "ec" '(evilnc-comment-or-uncomment-lines :which-key "toggle comment")
-
 
    ;; Errors
    "e" '(:ignore t :which-key "errors")
@@ -1091,12 +1091,8 @@
    "occ" '(org-capture :which-key "capture")
    "oci" '(org-clock-in :which-key "clock-in")
    "oco" '(org-clock-out :which-key "clock-out")
-   "or" '(:ignore t :which-key "roam")
-   "orc" '(org-roam-capture :which-key "capture")
-   "orc" '(org-roam-find-file :which-key "find-file")
-   "ord" '(:ignore t :which-key "dailies")
-   "ordc" '(org-roam-dailies-capture-today :which-key "capture")
-   "ordf" '(org-roam-dailies-find-today :which-key "find")
+   "or" '(:ignore t :which-key "ref")
+   "orr" '(org-ref-insert-link :which-key "search")
 
    ;; Projects
    "p" '(:ignore t :which-key "projects")
@@ -1120,38 +1116,27 @@
    ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
    ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
 
-   ;; R language bindings
-   ;; TODO: Fold R-bindings into something more general
-   ;; "r" '(:ignore t :which-key "R")
-   ;; "rI" '(ess-r-devtools-install-package :which-key "install package")
-   ;; "rL" '(ess-r-devtools-install-package :which-key "load package")
-   ;; "rp" '(:ignore t :which-key "project")
-   ;; "rpb" '(ess-r-devtools-build :which-key "build")
-   ;; "rpc" '(ess-r-devtools-check-package :which-key "check")
-   ;; "rpt" '(ess-r-devtools-test-package :which-key "test")
-   ;; "rh" '(ess-display-help-on-object :which-key "help")
-   ;; "ro" '(ess-rdired :which-key "object")
-   ;; "rt" '(ess-eval-structure :which-key "structure")
-   ;; "ri" '(asb-ess-R-object-popup-str :which-key "inspect")
-   ;; "rdi" '(asb-ess-R-object-popup-str :which-key "inspect")
-   ;; "rdI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
-   ;; "rdc" '(asb-ess-R-object-popup-cls :which-key "class")
-   ;; "rr" '(ess-eval-region-and-go :which-key "eval")
-   ;; "rq" '(ess-watch-quit :which-key "quit")
+   "r" '(:ignore t :which-key "roam")
+   "rr" '(org-roam-node-find :which-key "find-node")
+   "rc" '(org-roam-capture :which-key "capture")
+   "ri" '(org-roam-node-insert :which-key "insert")
+   "rg" '(org-roam-graph :which-key "graph")
+   "rs" '(org-roam-db-sync :which-key "sync")
+   "rd" '(:ignore t :which-key "dailies")
+   "rdc" '(org-roam-dailies-capture-today :which-key "capture")
+   "rdf" '(org-roam-dailies-find-today :which-key "find")
 
    ;; Todos
    "t" '(:ignore t :which-key "todos")
    "tt" '(ivy-magit-todos :which-key "goto")
 
    ;; Tabs
-   ;; TODO: Create tab bindings
-   ;; TODO: Add tab bindings to be like window bindings in awesome
-   ;; (define-key my-leader-map "tc" 'tab-bar-new-tab)
    "TAB" '(:ignore t :which-key "Tabs")
    "TAB TAB" '(tab-bar-select-tab-by-name :which-key "Goto")
    "TAB T" '(toggle-tab-bar-mode-from-frame :which-key "toggle from frame")
    "TAB d" '(tab-bar-close-tab :which-key "Delete")
-   "TAB c" '(tab-bar-close-tab :which-key "Create")
+   "TAB c" '(tab-bar-new-tab :which-key "Create")
+   "TAB n" '(tab-bar-new-tab :which-key "New")
    "TAB l" '(tab-bar-switch-to-next-tab :which-key "Next")
    "TAB h" '(tab-bar-switch-to-prev-tab :which-key "Previous")
    "TAB r" '(tab-bar-rename-tab :which-key "Rename")
@@ -1192,13 +1177,7 @@
    "w-" '(evil-window-split :which-key "split")
    "w|" '(evil-window-vsplit :which-key "vsplit")
    "w|" '(balance-windows :which-key "balance")
-
-  ;; TODO: Create window resizing hydra
-  ;;  (define-key my-leader-map "wJ" 'evil-window-decrease-height)
-  ;;  (define-key my-leader-map "wK" 'evil-window-increase-height)
-  ;;  (define-key my-leader-map "wH" 'evil-window-decrease-width)
-  ;;  (define-key my-leader-map "wL" 'evil-window-increase-width)
-
+   "w>" '(hydra-window-resize/body :which-key "hydra")
 
    ;; Snippets
    "y" '(:ignore t :which-key "yasnippets")
@@ -1321,6 +1300,15 @@
     ("j" text-scale-increase "in")
     ("k" text-scale-decrease "out")
     ("q" nil "quit" :exit t))
+
+  (defhydra hydra-window-resize (:timeout 4)
+    "scale text"
+    ("j" evil-window-increase-height "inc-height")
+    ("k" evil-window-decrease-height "dec-height")
+    ("l" evil-window-increase-width "inc-width")
+    ("h" evil-window-decrease-width "dec-width")
+    ("q" nil "quit" :exit t))
+
 
   ;; (misenplace/leader-keys
   ;;   "xs" '(hydra-text-scale/body :which-key "scale text"))
@@ -1481,7 +1469,6 @@
   :straight t
   :config
   (nyan-mode 1))
-
 (use-package olivetti
   :straight t
   )
@@ -1496,6 +1483,10 @@
   :straight t
   :config
   ;; Set org-mode for .org files
+(setq org-format-latex-options '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+	     ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+
   (setq auto-mode-alist (cons '("\\.org" . org-mode) auto-mode-alist))
 
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
@@ -1625,11 +1616,13 @@
   :init
   (setq org-ref-completion-library 'org-ref-ivy-cite)
   :config
-  (setq reftex-default-bibliography '("~/git_repos/phd_comps2/js_phd_comp.bib"))
+  (setq reftex-default-bibliography '("~/research/dissertation/main.bib"))
 
   ;; see org-ref for use of these variables
+  (setq bibtex-completion-bibliography '("~/org/ref/references.bib"
+					 "~/research/dissertation/main.bib"))
   (setq org-ref-bibliography-notes "~/Dropbox/bibliography/notes.org"
-     org-ref-default-bibliography '("~/git_repos/phd_comps2/js_phd_comp.bib")
+     org-ref-default-bibliography '("~/research/dissertation/main.bib")
      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
 
   )
@@ -1674,6 +1667,18 @@
       (org-roam-directory (file-truename "~/org/org-roam/"))
       (org-roam-dailies-directory (file-truename "~/org/org-roam-daily/"))
       :config
+      (org-roam-db-autosync-mode)
+
+      (setq org-roam-capture-templates
+	    '(("d" "default" plain "%?" :target
+	       (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+	       :unnarrowed t)
+	      ("r" "ref" plain "%?"
+	       :target (file+head "refs/${citekey}.org"
+				  "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+	       :unnarrowed t)
+	      ))
+
       (setq org-roam-dailies-capture-templates
             '(("d" "default" entry
                #'org-roam-capture--get-point
@@ -1681,32 +1686,41 @@
                :file-name "org-roam-daily/%<%Y-%m-%d>"
                :head "#+title: %<%Y-%m-%d>\n\n"
                :olp ("Misc notes"))
+          ("r" "ref" plain
+           "%?"
+           :target (file+head "refs/${citekey}.org"
+                              ,(s-join "\n" (list "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n"
+                                                  "Title:\n"
+                                                  "Year:\n"
+                                                  "Authors:\n"
+                                                  "Location:\n"
+                                                  "* Reading notes:\n"
+                                                  "* Initial thoughts:\n"
+                                                  "* High-level summary:\n"
+                                                  "* Quick-notes:\n"
+                                                  "* In-depth notes:\n"
+                                                  "* Quotes:\n")))
+           :unnarrowed t)
+          ("p" "ref + physical" plain
+           "%?"
+           :target (file+head "refs/${citekey}.org"
+                              "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n* Notes :physical:")
+           :unnarrowed t)
+          ("n" "ref + noter" plain
+           "%?"
+           :target (file+head "refs/${citekey}.org"
+                              ,(s-join "\n" (list "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n"
+                                                  "* Notes :noter:"
+                                                  ":PROPERTIES:"
+                                                  ":NOTER_DOCUMENT: %(orb-process-file-field \"${citekey}\")"
+                                                  ":NOTER_PAGE:"
+                                                  ":END:")))
+           :unnarrowed t)
 
-              ("l" "lab" entry
-                #'org-roam-capture--get-point
-                "* %?"
-                :file-name "org-roam-daily/%<%Y-%m-%d>"
-                :head "#+title: %<%Y-%m-%d>\n"
-                :olp ("Lab notes"))
-
-               ("j" "journal" entry
-                #'org-roam-capture--get-point
-                "* %?"
-                :file-name "org-roam-daily/%<%Y-%m-%d>"
-                :head "#+title: %<%Y-%m-%d>\n"
-                :olp ("Journal"))))
-
-      :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))
-              (("C-c n I" . org-roam-insert-immediate))))
+               )))
 (use-package org-roam-bibtex
   :straight t
   )
-
 ;; (use-package org-roam-server
 ;;   :straight t
 ;;   :after org-roam
@@ -2066,8 +2080,9 @@
   :straight t
   )
 (use-package sublimity
+  :disabled ;; Doesn't seem to work... but who cares anyway
   :straight t
-  ) ;; TODO: Figure out why sublimity package doesn't work.
+  )
 (use-package swiper
   :straight t
   )
@@ -2215,7 +2230,6 @@
 ;; (setq inhibit-splash-screen t)
 ;; (org-agenda-list)
 ;; (delete-other-windows)
-
 
 (load-file "~/.emacs.d/personal-configs.el")
 
