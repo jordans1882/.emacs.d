@@ -210,6 +210,8 @@
     (kill-emacs)
     )
 
+  ;; Tab bar settings
+  (set-face-attribute 'tab-bar-tab nil :inherit 'doom-modeline-panel :foreground nil :background nil)
 
   )
 (use-package ace-jump-mode
@@ -842,6 +844,19 @@
      "C-o" 'gumshoe-persp-backtrack-back
      "C-i" 'gumshoe-persp-backtrack-forward
      )
+
+  (general-define-key
+     :states '(normal visual treemacs)
+     :keymaps '(treemacs-mode-map)
+
+     ;; General
+     "C-o" 'gumshoe-persp-backtrack-back
+     "C-i" 'gumshoe-persp-backtrack-forward
+     "C-<tab>" 'tab-bar-switch-to-next-tab
+     "M-l" 'evil-window-right
+  )
+
+
 
 
   ;; Define lisp interaction modes
