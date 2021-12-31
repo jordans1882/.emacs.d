@@ -44,6 +44,16 @@
 
 
   ;; Utility funs
+
+  ;; (defun create-misenplace-cache
+  ;;     "Creates folder and sets up variables for misenplace cache"
+  ;;   (setq misenplace-cache-location "~/.emacs.d/misenplace-cache/")
+  ;;   (if (not (f-exists? misenplace-cache-location))
+  ;; 	(make-directory misenplace-cache-location))
+  ;;   ;; TODO: declare and set variables and allow for custom-set
+  ;;   )
+
+
   (defun dawn ()
     "Set theme to dawn"
     (interactive)
@@ -118,81 +128,94 @@
   ;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; Python Project Template
-   (defun make-python-project ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (setq python-template-repo "git@github.com:jordans1882/template-python.git")
-     (setq proj-name (read-string "Enter your project name:"))
-     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
-     ;; TODO: Add check if project already exists for make-python-project
-     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
-     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
-     (shell-command-to-string clone-command)
-     (shell-command-to-string rm-git-command)
-     (magit-init proj-dir) ;; use hub for this?
-     (projectile-add-known-project proj-dir)
-     )
+  (defun make-python-project ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (setq python-template-repo "git@github.com:jordans1882/template-python.git")
+    (setq proj-name (read-string "Enter your project name:"))
+    (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+    (if (f-exists? proj-dir)
+ (message (concatenate 'string proj-name " project already exists"))
+ (progn (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
+	(setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+	(shell-command-to-string clone-command)
+	(shell-command-to-string rm-git-command)
+	(magit-init proj-dir) ;; use hub for this?
+	(projectile-add-known-project proj-dir))))
 
-   (defun select-tab-first ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 1))
-   (defun select-tab-second ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 2))
-   (defun select-tab-third ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 3))
-   (defun select-tab-fourth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 4))
-   (defun select-tab-fifth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 5))
-   (defun select-tab-sixth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 6))
-   (defun select-tab-seventh ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 7))
-   (defun select-tab-eighth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 8))
-   (defun select-tab-ninth ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (tab-bar-select-tab 9))
+  (defun select-tab-first ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 1))
+  (defun select-tab-second ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 2))
+  (defun select-tab-third ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 3))
+  (defun select-tab-fourth ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 4))
+  (defun select-tab-fifth ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 5))
+  (defun select-tab-sixth ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 6))
+  (defun select-tab-seventh ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 7))
+  (defun select-tab-eighth ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 8))
+  (defun select-tab-ninth ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (tab-bar-select-tab 9))
 
-   (defun make-r-project ()
-     "Prompt user to enter a directory name and create project."
-     (interactive)
-     (setq python-template-repo "git@github.com:jordans1882/templater.git")
-     (setq proj-name (read-string "Enter your project name:"))
-     (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
-     ;; TODO: Add check if project already exists for make-python-project
-     (setq clone-command (concatenate 'string "git clone " python-template-repo " " proj-dir))
-     (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
-     (shell-command-to-string clone-command)
-     (shell-command-to-string rm-git-command)
-     (magit-init proj-dir) ;; use hub for this?
-     (projectile-add-known-project proj-dir)
-     )
+  (defun make-r-project ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (setq r-template-repo "git@github.com:jordans1882/templater.git")
+    (setq proj-name (read-string "Enter your project name:"))
+    (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+    ;; TODO: Add check if project already exists for make-r-project
+    (setq clone-command (concatenate 'string "git clone " r-template-repo " " proj-dir))
+    (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+    (shell-command-to-string clone-command)
+    (shell-command-to-string rm-git-command)
+    (magit-init proj-dir) ;; use hub for this?
+    (projectile-add-known-project proj-dir)
+    )
 
+  (defun make-cpp-project ()
+    "Prompt user to enter a directory name and create project."
+    (interactive)
+    (setq cpp-template-repo "git@github.com:jordans1882/templatepp.git")
+    (setq proj-name (read-string "Enter your project name:"))
+    (setq proj-dir (concatenate 'string "~/git_repos/" proj-name))
+    ;; TODO: Add check if project already exists for make-cpp-project
+    (setq clone-command (concatenate 'string "git clone " cpp-template-repo " " proj-dir))
+    (setq rm-git-command (concatenate 'string "rm -rf " proj-dir "/.git"))
+    (shell-command-to-string clone-command)
+    (shell-command-to-string rm-git-command)
+    (magit-init proj-dir) ;; use hub for this?
+    (projectile-add-known-project proj-dir))
 
-   (defun get-linux-os-name ()
-     "Get the name of the linux operating system"
-     (interactive)
-     (replace-regexp-in-string
-      "\n$" ""
-      (shell-command-to-string
-       "cat /etc/os-release | grep 'NAME' | head -n 1 | cut -c7- | sed 's/[/\"]//'")))
+  (defun get-linux-os-name ()
+    "Get the name of the linux operating system"
+    (interactive)
+    (replace-regexp-in-string
+     "\n$" ""
+     (shell-command-to-string
+      "cat /etc/os-release | grep 'NAME' | head -n 1 | cut -c7- | sed 's/[/\"]//'")))
 
   (add-hook 'lisp-interaction-mode-hook 'company-mode)
 
@@ -598,6 +621,9 @@
 (use-package ein
   :straight t
   )
+(use-package emojify
+  :straight t
+  :hook (after-init . global-emojify-mode))
 (use-package ess
   :straight t
   :config
@@ -665,12 +691,6 @@
    (interactive "sR function to execute: ")
    (asb-ess-R-object-popup r-func))
 )
-(use-package native-complete
-  :straight (:host github :repo "CeleritasCelery/emacs-native-shell-complete")
-  :config
-   (with-eval-after-load 'shell
-     (native-complete-setup-bash))
-   )
 (use-package evil
    :straight t
    :init
@@ -765,7 +785,7 @@
   ;; Define evil-globals
 
   (general-create-definer misenplace/leader-keys
-			  :states '(normal insert visual emacs)
+			  :states '(normal insert visual emacs override)
 			  :prefix ","
 			  :global-prefix "C-,"
 			  )
@@ -782,7 +802,7 @@
 
   (general-define-key
      :states '(normal visual insert)
-     :keymaps '(global-map evil-normal-state-map)
+     :keymaps '(global-map evil-normal-state-map override)
      ;; "C-c C-c" 'evilnc-comment-or-uncomment-lines ;; TODO: find a new bind for commenting
      "C-=" 'text-scale-increase
      "C--" 'text-scale-decrease
@@ -829,13 +849,20 @@
      )
 
 
-  ;; (global-set-key [(control shift iso-lefttab)] 'tab-previous))
 
+  ;; TODO: add override to keymaps?
+  (general-define-key
+     :states '(insert)
+     :keymaps '(global-map evil-normal-state-map)
+     "<tab>" 'self-insert-command
+     )
+
+  ;; (global-set-key [(control shift iso-lefttab)] 'tab-previous))
 
   ;; Define evil normals and visuals
   (general-define-key
      :states '(normal visual)
-     :keymaps '(global-map evil-normal-state-map)
+     :keymaps '(global-map evil-normal-state-map override)
      "q" 'keyboard-escape-quit
      "zj" 'origami-next-fold
      "zk" 'origami-previous-fold
@@ -1249,26 +1276,27 @@
                      :host github
                      :repo "Overdr0ne/gumshoe"
                      :branch "master")
-  :after perspective persp-projectile
+  :after (:all perspective persp-projectile)
   :config
-  (global-gumshoe-mode 1)
+  ;; (global-gumshoe-mode +1)
   (global-gumshoe-persp-mode +1)
   (setf gumshoe-slot-schema '(perspective time buffer position line))
+  (setq gumshoe-show-footprints-p nil)
   ;; define a command for autocompletion of the gumshoe--global log if you’d like:
-  (defun consult-gumshoe-global ()
-    "List global gumshoes in consult"
-    (interactive)
-    (consult-global-mark (ring-elements (oref gumshoe--global-backlog log))))
-  ;; Similarly, for the persp local gumshoe--persp log, assuming perspectives is installed:
-  (defun consult-gumshoe-persp ()
-    "List perspective gumshoes in consult"
-    (interactive)
-    (consult-global-mark (ring-elements (oref gumshoe--persp-backlog log))))
-  ;; Similarly, for the buffer local gumshoe--persp log:
-  (defun consult-gumshoe-buf ()
-    "List buffer gumshoes in consult"
-    (interactive)
-    (consult-global-mark (ring-elements (oref gumshoe--buf-backlog log))))
+  ;; (defun consult-gumshoe-global ()
+  ;;   "List global gumshoes in consult"
+  ;;   (interactive)
+  ;;   (consult-global-mark (ring-elements (oref gumshoe--global-backlog log))))
+  ;; ;; Similarly, for the persp local gumshoe--persp log, assuming perspectives is installed:
+  ;; (defun consult-gumshoe-persp ()
+  ;;   "List perspective gumshoes in consult"
+  ;;   (interactive)
+  ;;   (consult-global-mark (ring-elements (oref gumshoe--persp-backlog log))))
+  ;; ;; Similarly, for the buffer local gumshoe--persp log:
+  ;; (defun consult-gumshoe-buf ()
+  ;;   "List buffer gumshoes in consult"
+  ;;   (interactive)
+  ;;   (consult-global-mark (ring-elements (oref gumshoe--buf-backlog log))))
   )
 ;; (use-package hideshowvis ;; Would like this to work with origami-mode...
 ;;   :straight t
@@ -1489,6 +1517,12 @@
 ;;   (setq mu4e-refile-folder "/[Gmail].All Mail")
 ;;   (setq mu4e-trash-folder "/[Gmail].Trash")
 ;;   )
+(use-package native-complete
+  :straight (:host github :repo "CeleritasCelery/emacs-native-shell-complete")
+  :config
+   (with-eval-after-load 'shell
+     (native-complete-setup-bash))
+   )
 (use-package nyan-mode
   :straight t
   :config
