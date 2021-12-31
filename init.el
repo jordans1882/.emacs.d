@@ -2217,7 +2217,8 @@
 ;; (delete-other-windows)
 
 
-(load-file "~/.emacs.d/personal-configs.el")
+(if (file-exists-p "~/.emacs.d/personal-configs.el")
+    (load-file "~/.emacs.d/personal-configs.el"))
 
 ;; (eval-after-load
 ;; 'company
