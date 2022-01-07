@@ -830,8 +830,9 @@
      "M-v" 'evil-window-vsplit
      "M-S-j" 'evil-rotate-upwards
      "M-S-k" 'evil-rotate-downwards
-     ;; "M-S-<tab>" 'tab-bar-switch-to-prev-tab
-     ;; "M-<tab>" 'tab-bar-switch-to-prev-tab
+     "M-S-<tab>" 'tab-bar-switch-to-prev-tab
+     "M-<iso-lefttab>" 'tab-bar-switch-to-prev-tab
+     "M-<tab>" 'tab-bar-switch-to-next-tab
      "M-C-r" 'restart-emacs
      "M-S-c" 'evil-window-delete
      "M-q" 'evil-window-delete
@@ -880,6 +881,7 @@
      "C-o" 'gumshoe-persp-backtrack-back
      "C-i" 'gumshoe-persp-backtrack-forward
      "C-<tab>" 'tab-bar-switch-to-next-tab
+     "M-<tab>" 'tab-bar-switch-to-next-tab
      "M-l" 'evil-window-right
   )
 
