@@ -57,31 +57,31 @@
   (defun dawn ()
     "Set theme to dawn"
     (interactive)
-    (counsel-load-theme-action "doom-gruvbox-light"))
+    (counsel-load-theme-action "base16-gruvbox-light-soft"))
   (defun morning ()
     "Set theme to morning"
     (interactive)
-    (counsel-load-theme-action "doom-solarized-light"))
+    (counsel-load-theme-action "base16-gruvbox-light-hard"))
   (defun day ()
     "Set theme to day"
     (interactive)
-    (counsel-load-theme-action "tsdh-light"))
+    (counsel-load-theme-action "base16-humanoid-light"))
   (defun sunny ()
     "Set theme to sunny"
     (interactive)
-    (counsel-load-theme-action "doom-homage-white"))
+    (counsel-load-theme-action "base16-mexico-light"))
   (defun dusk ()
     "Set theme to dusk"
     (interactive)
-    (counsel-load-theme-action "doom-nova"))
+    (counsel-load-theme-action "base16-nova"))
   (defun evening ()
     "Set theme to evening"
     (interactive)
-    (counsel-load-theme-action "doom-gruvbox"))
+    (counsel-load-theme-action "base16-darktooth"))
   (defun late-night ()
     "Set theme to late-night"
     (interactive)
-    (counsel-load-theme-action "doom-Iosvkem"))
+    (counsel-load-theme-action "base16-pop"))
 
 
   (defun set-target-buffer (buffer)
@@ -275,6 +275,10 @@
   (add-hook 'after-init-hook (lambda ()
 			       (when (fboundp 'auto-dim-other-buffers-mode)
 				 (auto-dim-other-buffers-mode t))))
+  )
+(use-package base16-theme
+  :straight t
+  ;; (load-theme 'base16-darktooth t)
   )
 (use-package bash-completion
   :straight t
@@ -569,7 +573,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-tomorrow-night t)
+  ;; (load-theme 'doom-tomorrow-night t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -1199,8 +1203,8 @@
    "u" '(:ignore t :which-key "ui")
    "ud" '(day :which-key "Day Theme")
    "uD" '(dusk :which-key "Dusk Theme")
-   "ue" '(day :which-key "Evening Theme")
-   "un" '(day :which-key "Night Theme")
+   "ue" '(evening :which-key "Evening Theme")
+   "un" '(night :which-key "Night Theme")
    "us" '(hydra-text-scale/body :which-key "scale text")
    "ut" '(:ignore t :which-key "toggle")
    "uT" '(counsel-load-theme :which-key "Theme")
@@ -1299,6 +1303,9 @@
   ;;   "List buffer gumshoes in consult"
   ;;   (interactive)
   ;;   (consult-global-mark (ring-elements (oref gumshoe--buf-backlog log))))
+  )
+(use-package haskell-mode
+  :straight t
   )
 ;; (use-package hideshowvis ;; Would like this to work with origami-mode...
 ;;   :straight t
@@ -2124,6 +2131,10 @@
   )
 (use-package rainbow-mode
   :straight t
+  :config
+  (define-globalized-minor-mode my-global-rainbow-mode rainbow-mode
+    (lambda () (rainbow-mode 1)))
+  (my-global-rainbow-mode 1)
   )
 (use-package ranger
   :straight t
