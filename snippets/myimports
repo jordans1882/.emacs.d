@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: myimports
+# key: <ii
+# --
+
+import os
+import numpy as np
+import pandas as pd
+
+$0

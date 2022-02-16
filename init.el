@@ -1,6 +1,6 @@
-;; Misenplace:
+;; misenplace:
 
-;; My emacs config
+;; my emacs config
 
 ;; (require 'package)
 ;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -27,6 +27,10 @@
 
 (use-package emacs
   :config
+
+  ;; Set Warning Level
+  (setq warning-minimum-level :emergency)
+
   ;; Appearance
   (set-face-attribute 'default nil :height 170)          ;; Font size
   (menu-bar-mode -1)                                     ;; Remove top Menu
@@ -36,12 +40,11 @@
   ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
   ;; Functionality
+  (setq require-final-newline nil)
   (setq backup-directory-alist `(("." . "~/.emacs.d/.saves"))) ;; Set backups directory
   (setq auto-save-file-name-transforms                   ;; Set autosave directory
   `((".*" "~/.emacs.d/auto-saves/" t)))
-
   (setq tab-bar-select-tab-modifiers "meta")
-
 
   ;; Utility funs
 
@@ -53,6 +56,38 @@
   ;;   ;; TODO: declare and set variables and allow for custom-set
   ;;   )
 
+  ;; hide-show config
+  (add-hook 'python-mode-hook 'hs-minor-mode)
+
+
+  (defun test-pos-frame ()
+    "A simple pos-frame tester fun"
+    (interactive)
+    (defvar my-posframe-buffer " *my-posframe-buffer*")
+
+    (with-current-buffer (get-buffer-create my-posframe-buffer)
+    (erase-buffer)
+    (Lorem-ipsum-insert-paragraphs)
+    (insert "Hello World"))
+
+    (when (posframe-workable-p)
+    (posframe-show my-posframe-buffer
+		    :position (point))))
+
+  (defvar dark-mode t)
+
+  (defun  toggle-dark-mode ()
+    "Toggle Dark mode"
+    (interactive)
+    (if dark-mode
+	(progn
+	    (counsel-load-theme-action "base16-humanoid-light")
+	    (message "Dark mode was on")
+	    (setq  dark-mode nil))
+	(progn
+	    (counsel-load-theme-action "base16-darktooth")
+	    (message "Dark mode was off")
+	    (setq  dark-mode t))))
 
   (defun dawn ()
     "Set theme to dawn"
@@ -370,6 +405,17 @@
 (use-package clojure-mode
   :straight t
   )
+(use-package cmake-mode
+  :straight t
+  :config
+    ;; (defun my-set-tab-mode ()
+    ;; (when (and (stringp buffer-file-name)
+    ;; 		(string-match "\\CMakeLists.txt\\'" buffer-file-name))
+    ;; 	(cmake-mode)))
+
+    ;; (add-hook 'find-file-hook 'my-set-tab-mode)
+  ;; TODO: add configuration to auto cmake-mode on CMakeList.txt files
+  )
 (use-package cmake-ide
   :straight t
   :config
@@ -384,6 +430,13 @@
   ;;(add-to-list 'auto-mode-alist '("\\.h\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.hpp\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.cpp\\'" . company-mode))
+  )
+
+(use-package company-ctags
+  :straight t
+  :after company
+  :config
+    (company-ctags-auto-setup)
   )
 (use-package company-irony
   :straight t
@@ -497,6 +550,20 @@
 (use-package counsel
   :straight t
   )
+
+(use-package counsel-etags
+  :straight t
+  :ensure t
+  :bind (("C-]" . counsel-etags-find-tag-at-point))
+  :init
+    (add-hook 'prog-mode-hook
+	    (lambda ()
+	    (add-hook 'after-save-hook
+		'counsel-etags-virtual-update-tags 'append 'local)))
+  :config
+    (setq counsel-etags-update-interval 60)
+    (push "build" counsel-etags-ignore-directories))
+
 (use-package counsel-tramp
   :straight t
   )
@@ -625,6 +692,12 @@
 (use-package ein
   :straight t
   )
+(use-package julia-mode
+  :straight t
+  )
+(use-package jupyter
+  :straight t
+  )
 (use-package emojify
   :straight t
   :hook (after-init . global-emojify-mode))
@@ -748,9 +821,9 @@
   :config
   (evil-snipe-mode +1)
   (evil-snipe-override-mode +1))
-(use-package evil-nerd-commenter
-  :straight t
-  )
+;; (use-package evil-nerd-commenter
+;;   :straight t
+;;   )
 (use-package evil-org
   :straight t
   :after org
@@ -784,27 +857,24 @@
   :straight t
   :after (:all which-key hydra org-super-agenda)
   :config
-  ;; (general-evil-setup t)
+  ;; (general-evil-setup t) ;; TODO: investigate commented code
 
-  ;; Define evil-globals
-
-  (general-create-definer misenplace/leader-keys
+  (general-create-definer misenplace/leader-keys ;; Define leader key
 			  :states '(normal insert visual emacs override)
 			  :prefix ","
 			  :global-prefix "C-,"
 			  )
 
 
-  (general-define-key
+  (general-define-key ;; global, evil-normal-state- states: normal, visual, insert
      :states '(normal)
      :keymaps '(global-map evil-normal-state-map)
-     "f" 'link-hint-open-link
+     ;; "f" 'link-hint-open-link ;; TODO: move to org-mode override??
      "C-o" 'gumshoe-persp-backtrack-back
      "C-i" 'gumshoe-persp-backtrack-forward
      )
 
-
-  (general-define-key
+  (general-define-key ;; global, evil-normal-state - states: normal, visual, insert
      :states '(normal visual insert)
      :keymaps '(global-map evil-normal-state-map override)
      ;; "C-c C-c" 'evilnc-comment-or-uncomment-lines ;; TODO: find a new bind for commenting
@@ -853,10 +923,8 @@
      "C-k" 'kill-word
      )
 
-
-
   ;; TODO: add override to keymaps?
-  (general-define-key
+  (general-define-key ;; evil insert-mode bindings
      :states '(insert)
      :keymaps '(global-map evil-normal-state-map)
      "<tab>" 'self-insert-command
@@ -864,12 +932,12 @@
 
   ;; (global-set-key [(control shift iso-lefttab)] 'tab-previous))
 
-  ;; Define evil normals and visuals
-  (general-define-key
+  (general-define-key ;; Evil normal and visual mode bindings
      :states '(normal visual)
      :keymaps '(global-map evil-normal-state-map override)
      "q" 'keyboard-escape-quit
      "zj" 'origami-next-fold
+     "zM" 'hs-hide-level
      "zk" 'origami-previous-fold
      "zn" 'origami-next-fold
      "zp" 'origami-previous-fold
@@ -877,11 +945,9 @@
      "C-i" 'gumshoe-persp-backtrack-forward
      )
 
-  (general-define-key
+  (general-define-key ;; treemacs
      :states '(normal visual treemacs)
      :keymaps '(treemacs-mode-map)
-
-     ;; General
      "C-o" 'gumshoe-persp-backtrack-back
      "C-i" 'gumshoe-persp-backtrack-forward
      "C-<tab>" 'tab-bar-switch-to-next-tab
@@ -889,64 +955,57 @@
      "M-l" 'evil-window-right
   )
 
-
-
-
-  ;; Define lisp interaction modes
-  (general-define-key
+  (general-define-key ;; lisp interaction
      :states '(normal visual)
      :keymaps '(lisp-interaction-mode-map)
-
-     ;; General
      "M-<RET>" 'eval-defun
      "C-o" 'gumshoe-persp-backtrack-back
      "C-i" 'gumshoe-persp-backtrack-forward
   )
 
-
-  ;; Treemacs modemap bindings
-  (general-define-key
+  (general-define-key ;; Treemacs modemap bindings
      :states '(normal visual)
      :keymaps '(treemacs-mode-map)
-
-     ;; General
      "M-l" 'evil-window-right
      "M-d" 'treemacs-quit
   )
 
-
-  ;; Org-agenda modemap bindings
-  (general-define-key
+  (general-define-key ;; Org-agenda modemap bindings
      :states '(normal visual)
      :keymaps '(org-agenda-mode-map)
-
-     ;; General
      "j" 'org-agenda-next-line
      "k" 'org-agenda-previous-line
   )
 
-
-  (general-define-key
+  (general-define-key ;; org-super-agenda-header-map
      :states '(normal visual)
      :keymaps '(org-super-agenda-header-map)
 
-     ;; General
      "j" 'org-agenda-next-line
      "k" 'org-agenda-previous-line
   )
 
+  (general-define-key ;; python-mode-map
+     :states '(normal visual)
+     :keymaps '(sh-mode-map)
+     "M-<RET>" '(bg-elpy-shell-send-statement-and-step :which-key "send")
+     ;; ",l" '(:ignore t :which-key "Python")
+     ;; ",la" '(elpy-goto-assignment :which-key "goto-Assignment")
+     )
 
-  ;; Define R modes
-  (general-define-key
+
+
+
+
+  (general-define-key ;; python-mode-map
      :states '(normal visual)
      :keymaps '(python-mode-map)
-     ;; General
-     "M-<RET>" 'bg-elpy-shell-send-statement-and-step
-
+     ;; "M-<RET>" '(bg-elpy-shell-send-statement-and-step :which-key "send")
      ",l" '(:ignore t :which-key "Python")
      ",la" '(elpy-goto-assignment :which-key "goto-Assignment")
      ",lc" '(elpy-shell-send-defclass-and-step :which-key "send defClass")
      ",ld" '(elpy-goto-definition :which-key "goto-Definition")
+     ",le" '(conda-environment-activate :which-key "environment (conda)")
      ",lf" '(elpy-format-code :which-key "Format")
      ;; ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
      ;; ",ldc" '(asb-ess-R-object-popup-cls :which-key "class")
@@ -965,15 +1024,24 @@
      )
 
 
+  (general-define-key ;; TeX mode
+     :states '(normal visual)
+     :keymaps '(TeX-mode-map)
+     ",hh" '(TeX-documentation-texdoc :which-key "documentation")
+     )
 
 
+  (general-define-key ;; Racket mode
+     :states '(normal visual)
+     :keymaps '(racket-mode-map)
+     "M-<RET>" 'racket-send-definition
+     ",hh" '(racket-repl-describe :which-key "documentation")
+     )
 
-  ;; Define R modes
-  (general-define-key
+  (general-define-key ;; ESS R mode
      :states '(normal visual)
      :keymaps '(ess-r-mode-map)
 
-     ;; General
      "M-<RET>" 'ess-eval-region-or-line-and-step
      "<C-M-return>" 'ess-eval-function-or-paragraph-and-step
 
@@ -982,7 +1050,7 @@
      ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
      ",ldc" '(asb-ess-R-object-popup-cls :which-key "class")
      ",lh" '(ess-display-help-on-object :which-key "help")
-     ",li" '(asb-ess-R-object-popup-str :which-key "introspect")
+     ",li" '(asa-ess-R-object-popup-str :which-key "introspect")
      ",lI" '(ess-r-devtools-install-package :which-key "install package")
      ",lL" '(ess-r-devtools-install-package :which-key "load package")
      ",lo" '(ess-rdired :which-key "object")
@@ -994,16 +1062,11 @@
      ",lt" '(ess-eval-structure :which-key "structure")
      )
 
-
-
-  ;; Define org modes
-  (general-define-key
+  (general-define-key ;; org-mode bindings
      :states '(normal visual)
      :keymaps '(org-mode-map)
 
-     ;; General
      "M-o" 'org-open-at-point
-
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
      "M-k" 'evil-window-up
@@ -1011,32 +1074,38 @@
      "M-SPC" 'send-line-to-target-process
      )
 
-
-  ;; Define python modes
-  (general-define-key
+  (general-define-key ;; python
      :states '(normal visual)
      :keymaps '(python-mode-map)
 
      ;; General
      "M-<RET>" 'elpy-shell-send-statement-and-step
-
      )
 
-  (general-define-key
+  (general-define-key ;; python
      :states '(normal visual)
      :keymaps '(python-mode-map)
      :prefix ","
 
+     "c" '(:ignore t :which-key "Python")
+     "ca" '(elpy-goto-assignment :which-key "goto-Assignment")
+     "c <RET>" '(elpy-shell-send-defclass-and-step :which-key "send defClass")
+     "cg" '(:ignore t :which-key "GoTo")
+     "cgg" '(elpy-goto-definition :which-key "goto-Definition")
+     "ce" '(conda-environment-activate :which-key "environment (conda)")
+     "cf" '(elpy-format-code :which-key "Format")
+     "ch" '(elpy-doc :which-key "Help")
+     "ck" '(elpy-shell-kill :which-key "Kill")
+
      ;; Tests
      "x" '(:ignore t :which-key "tests")
+     "hh" '(elpy-doc :which-key "docs")
      "xx" '(python-pytest-function-dwim :which-key "this")
      "xm" '(python-pytest-dispatch :which-key "menu")
      "xf" '(python-pytest-file :which-key "file"))
 
 
-
-  ;; Define Leader
-  (misenplace/leader-keys
+  (misenplace/leader-keys ;; Leader bindings
    ;; Agenda
    "a" '(:ignore t :which-key "agenda")
    "aa" '(org-agenda :which-key "agenda")
@@ -1063,6 +1132,10 @@
    "bp" '(evil-previous-buffer :which-key "previous")
    "bd" '(evil-delete-buffer :which-key "delete")
    "br" '(rename-buffer :which-key "rename")
+
+   ;; Dumb-jump
+   "c" '(:ignore t :which-key "code")
+   "cc" '(counsel-imenu :which-key "go")
 
    ;; Dumb-jump
    "d" '(:ignore t :which-key "dumb-jump")
@@ -1137,6 +1210,9 @@
    "jw" '(evil-ace-jump-word-mode :which-key "word")
    "jl" '(evil-ace-jump-line-mode :which-key "line")
 
+
+   "ml" '(hide-mode-line-mode :which-key "toggle mode line")
+
    ;; Org
    "o" '(:ignore t :which-key "org")
    "oa" '(:ignore t :which-key "agenda")
@@ -1158,12 +1234,13 @@
    "pc" '(counsel-projectile-org-capture :which-key "capture")
    "pd" '(counsel-projectile-find-dir :which-key "directory")
    "pm" '(projectile-compile-project :which-key "compile")
-   "pp" '(projectile-persp-switch-project :which-key "switch")
+   "po" '(projectile-persp-switch-project :which-key "open")
+   "pp" '(persp-switch :which-key "switch")
    "pf" '(counsel-projectile-find-file :which-key "file")
    ;; "pq" '(projectile-kill-buffers :which-key "quit")
    "pq" '(persp-kill :which-key "quit")
    "pr" '(counsel-projectile-rg :which-key "ripgrep")
-   "ps" '(projectile-run-shell :which-key "shell")
+   "psn" '(projectile-run-shell :which-key "shell")
    "pt" '(:ignore t :which-key "test")
    "ptt" '(projectile-test-project :which-key "test all")
    "ptt" '(projectile-find-test-file :which-key "file")
@@ -1172,6 +1249,12 @@
    "pTr" '(projectile-tag-regenerate :which-key "regenerate")
    ;; (define-key my-leader-map "p[" 'projectile-previous-project-buffer)
    ;; (define-key my-leader-map "p]" 'projectile-next-project-buffer)
+
+
+   "q" '(:ignore t :which-key "quit")
+   "qq" '(save-buffers-kill-terminal :which-key "find-node")
+
+
 
    "r" '(:ignore t :which-key "roam")
    "rr" '(org-roam-node-find :which-key "find-node")
@@ -1211,6 +1294,7 @@
    "utt" '(toggle-transparency :which-key "toggle transparency")
    "utm" '(hide-mode-line-mode :which-key "toggle mode line")
    "utM" '(toggle-menu-bar-from-frame :which-key "toggle menu bar")
+   "uu" '(toggle-dark-mode :which-key "toggle dark mode")
 
    ;; Windows
    "w" '(:ignore t :which-key "window")
@@ -1239,6 +1323,7 @@
    ;; Snippets
    "y" '(:ignore t :which-key "yasnippets")
    "yy" '(yas-insert-snippet :which-key "insert snippet")
+   "yc" '(yas-new-snippet :which-key "new snippet")
 
    ;; Folds
    "z" '(:ignore t :which-key "folds")
@@ -1250,11 +1335,11 @@
    "zp" '(origami-previous-fold :which-key "previous fold")
    "zr" '(origami-open-all-nodes :which-key "open all folds")
    "zm" '(origami-close-all-nodes :which-key "close all folds")
+   "zM" '(hs-hide-level :which-key "close all at level")
    )
 
-  (misenplace/leader-keys
+  (misenplace/leader-keys ;; apply evil-normal to pdf-view?????
      :keymaps '(global-map evil-normal-state-map pdf-view-mode-map))
-
   )
 (use-package git-link
   :straight t
@@ -1307,6 +1392,11 @@
 (use-package haskell-mode
   :straight t
   )
+(use-package hide-mode-line
+  :straight t
+  :config
+  (global-hide-mode-line-mode t)
+  )
 ;; (use-package hideshowvis ;; Would like this to work with origami-mode...
 ;;   :straight t
 ;;   :disabled
@@ -1351,6 +1441,9 @@
  '(helm-ag-base-command "rg --no-heading")
  `(helm-ag-success-exit-status '(0 2))))
 (use-package helm-swoop
+  :straight t
+  )
+(use-package helm-gtags
   :straight t
   )
 (use-package hydra
@@ -1434,17 +1527,68 @@
 (use-package lorem-ipsum
   :straight t
   )
+(use-package lsp-docker
+  :straight t
+  :config
+  (defvar lsp-docker-client-packages
+    '(lsp-css lsp-clients lsp-bash lsp-go lsp-html lsp-pylsp ;; lsp-pyls
+	      lsp-dockerfile lsp-javascript lsp-terraform))
+
+  (setq lsp-docker-client-configs
+	'((:server-id bash-ls :docker-server-id bashls-docker :server-command "bash-language-server start")
+	  (:server-id css-ls :docker-server-id cssls-docker :server-command "css-languageserver --stdio")
+	  (:server-id dockerfile-ls :docker-server-id dockerfilels-docker :server-command "docker-langserver --stdio")
+	  (:server-id gopls :docker-server-id gopls-docker :server-command "gopls")
+	  (:server-id html-ls :docker-server-id htmls-docker :server-command "html-languageserver --stdio")
+	  ;; (:server-id pyls :docker-server-id pyls-docker :server-command "pyls")
+	  (:server-id pylsp :docker-server-id pylsp-docker :server-command "pylsp" :docker-image-id "martini97/lsp-docker-langservers" :docker-container-name "martini97-lsp-pylsp")
+	  (:server-id ts-ls :docker-server-id tsls-docker :server-command "typescript-language-server --stdio")))
+
+  ;; (let ((projects-dir (expand-file-name "~/Projects")))
+  ;;   (lsp-docker-init-clients
+  ;;     :path-mappings `((,projects-dir . "/projects"))
+  ;;     :client-packages lsp-docker-client-packages
+  ;;     :client-configs lsp-docker-client-configs))
+  )
 (use-package lsp-mode
   :straight t
   :commands lsp
   :config
+
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+
+  (add-to-list 'lsp-language-id-configuration '(TeX-mode . "latex"))
   (add-to-list 'lsp-language-id-configuration '(csharp-mode . "csharp"))
-  ;; (lsp-register-client
-  ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/bin/omnisharp" "-lsp"))
-  ;;                   :major-modes '(csharp-mode)
-  ;;                   :server-id 'csharp))
+  (add-to-list 'lsp-language-id-configuration '(go-mode . "go"))
+  (add-to-list 'lsp-language-id-configuration '(ess-r-mode . "r"))
+  (add-to-list 'lsp-language-id-configuration '(racket-mode . "racket"))
+
+  ;; Add language-mode hooks
+  (add-hook 'go-mode-hook 'lsp)
+  (add-hook 'go-mode-hook 'lsp-mode)
+
   (add-hook 'ess-r-mode-hook 'lsp-mode)
   (add-hook 'ess-r-mode-hook 'lsp)
+
+  (add-hook 'lua-mode-hook 'lsp-mode)
+  (add-hook 'lua-mode-hook 'lsp)
+
+  (add-hook 'python-mode-hook 'lsp-mode)
+  (add-hook 'python-mode-hook 'lsp)
+
+
+  (add-hook 'racket-mode-hook 'lsp-mode)
+  (add-hook 'racket-mode-hook 'lsp)
+
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+  (add-hook 'TeX-mode-hook 'lsp)
+  (add-hook 'TeX-mode-hook 'lsp-mode)
+
+  ;; Start LSP Mode and YASnippet mode
+  (add-hook 'go-mode-hook #'lsp-deferred) ;; TODO: Figure out exactly what this line does
+
 )
 (use-package lua-mode
   :straight t
@@ -1543,12 +1687,102 @@
   :straight t
   :config
   (setq ob-mermaid-cli-path "~/mermaid/node_modules/.bin/mmdc"))
+(use-package ob-async
+  :straight t
+  )
 ;; (use-package omnisharp-emacs
 ;;   :straight (:host github :repo "OmniSharp/omnisharp-emacs")
 ;;   )
 (use-package org
   :straight t
   :config
+
+  (defvar org-latex-fragment-last nil
+  "Holds last fragment/environment you were on.")
+
+(defun org-latex-fragment-toggle ()
+  "Toggle a latex fragment image "
+  (and (eq 'org-mode major-mode)
+       (let* ((el (org-element-context))
+              (el-type (car el)))
+         (cond
+          ;; were on a fragment and now on a new fragment
+          ((and
+            ;; fragment we were on
+            org-latex-fragment-last
+            ;; and are on a fragment now
+            (or
+             (eq 'latex-fragment el-type)
+             (eq 'latex-environment el-type))
+            ;; but not on the last one this is a little tricky. as you edit the
+            ;; fragment, it is not equal to the last one. We use the begin
+            ;; property which is less likely to change for the comparison.
+            (not (= (org-element-property :begin el)
+                    (org-element-property :begin org-latex-fragment-last))))
+           ;; go back to last one and put image back
+           (save-excursion
+             (goto-char (org-element-property :begin org-latex-fragment-last))
+             (org-preview-latex-fragment))
+           ;; now remove current image
+           (goto-char (org-element-property :begin el))
+           (let ((ov (loop for ov in org-latex-fragment-image-overlays
+                           if
+                           (and
+                            (<= (overlay-start ov) (point))
+                            (>= (overlay-end ov) (point)))
+                           return ov)))
+             (when ov
+               (delete-overlay ov)))
+           ;; and save new fragment
+           (setq org-latex-fragment-last el))
+
+          ;; were on a fragment and now are not on a fragment
+          ((and
+            ;; not on a fragment now
+            (not (or
+                  (eq 'latex-fragment el-type)
+                  (eq 'latex-environment el-type)))
+            ;; but we were on one
+            org-latex-fragment-last)
+           ;; put image back on
+           (save-excursion
+             (goto-char (org-element-property :begin org-latex-fragment-last))
+             (org-preview-latex-fragment))
+           ;; unset last fragment
+           (setq org-latex-fragment-last nil))
+
+          ;; were not on a fragment, and now are
+          ((and
+            ;; we were not one one
+            (not org-latex-fragment-last)
+            ;; but now we are
+            (or
+             (eq 'latex-fragment el-type)
+             (eq 'latex-environment el-type)))
+           (goto-char (org-element-property :begin el))
+           ;; remove image
+           (let ((ov (loop for ov in org-latex-fragment-image-overlays
+                           if
+                           (and
+                            (<= (overlay-start ov) (point))
+                            (>= (overlay-end ov) (point)))
+                           return ov)))
+             (when ov
+               (delete-overlay ov)))
+           (setq org-latex-fragment-last el))))))
+
+
+(add-hook 'post-command-hook 'org-latex-fragment-toggle)
+
+
+
+
+
+
+
+
+
+
   ;; Set org-mode for .org files
 (setq org-format-latex-options '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 	     ("begin" "$1" "$" "$$" "\\(" "\\[")))
@@ -1579,11 +1813,14 @@
   (setq org-odd-levels-only t)
 
   ;; Org-babel
+  (setq org-babel-python-command "/usr/local/bin/python")
   (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . nil)
       (shell . t)
       (python . t)
+      ;; (julia . t)
+      (C . t)
       (R . t)))
 
   ;; Latex
@@ -1665,6 +1902,10 @@
 	   "* TODO %?")
 	  ))
   )
+(use-package org-auto-tangle
+  :straight t
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
 (use-package ox-reveal
   :straight t
   :config
@@ -2136,6 +2377,9 @@
     (lambda () (rainbow-mode 1)))
   (my-global-rainbow-mode 1)
   )
+(use-package racket-mode
+  :straight t
+  )
 (use-package ranger
   :straight t
   :config
@@ -2278,6 +2522,12 @@
   :straight t
   :config
   (yas-global-mode 1)
+
+  (add-hook 'go-mode-hook #'yas-minor-mode)
+  (add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local yas/trigger-key [tab])
+            (define-key yas/keymap [tab] 'yas/next-field-or-maybe-expand)))
   ;;(setq yas-snippet-dirs '("~/git_repos/misenplace-snippets"))
     )
 (use-package slime
@@ -2315,6 +2565,7 @@
 (setq counsel-projectile-org-capture-templates '(("t" "[${name}] Todos" entry
 						  (file+headline "${root}/todo.org" "Todos")
 						  "*** TODO %?\n%u\n%a")))
+(setq require-final-newline nil)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
