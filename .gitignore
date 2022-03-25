@@ -1,5 +1,6 @@
 .cache/
 .cask/
+.dap-breakpoints
 .lsp-session-v1
 .org-generic-id-locations
 .org-id-locations
@@ -8,8 +9,10 @@ auto-save-list/
 auto-saves/
 bookmarks
 eaf/
+eln-cache/
 elpa/
 elpy/
+emojis/
 eshell/
 irony/
 org-roam.db

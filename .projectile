@@ -13,3 +13,15 @@ elpa
 .lsp-session-v1
 recentf
 forge-database.sqlite
+eln-cache/
+emojis/
+auto-saves/
+snippets/
+tramp
+eaf/
+irony/
+persist/
+.dap-breakpoints
+.org-id-locations
+.org-generic-id-locations
+request/

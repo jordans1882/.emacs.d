@@ -6,6 +6,7 @@
 ;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
 ;; Bootstrap straight.el
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -25,6 +26,7 @@
 
 ;; Use packages with configs
 
+
 (use-package emacs
   :config
 
@@ -36,6 +38,10 @@
   (menu-bar-mode -1)                                     ;; Remove top Menu
   (tool-bar-mode -1)                                     ;; Remove top toolbar
   (scroll-bar-mode -1)                                   ;; Remove scrollbar
+  (display-line-numbers-mode)
+  (when (version<= "26.0.50" emacs-version )
+    (global-display-line-numbers-mode))
+  (column-number-mode t)
   ;; (set-frame-parameter (selected-frame) 'alpha '(95 50)) ;; Set native alpha transparency
   ;; (add-to-list 'default-frame-alist '(alpha 95 50))      ;; Is one of these unnecessary?
 
@@ -47,6 +53,29 @@
   (setq tab-bar-select-tab-modifiers "meta")
 
   ;; Utility funs
+  (defun modi/revert-all-file-buffers ()
+  "Refresh all open file buffers without confirmation.
+  Buffers in modified (not yet saved) state in emacs will not be reverted. They
+  will be reverted though if they were modified outside emacs.
+  Buffers visiting files which do not exist any more or are no longer readable
+  will be killed."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (let ((filename (buffer-file-name buf)))
+      ;; Revert only buffers containing files, which are not modified;
+      ;; do not try to revert non-file buffers like *Messages*.
+      (when (and filename
+		 (not (buffer-modified-p buf)))
+	(if (file-readable-p filename) ;; If the file exists and is readable, revert the buffer.
+	    (with-current-buffer buf
+	      (revert-buffer :ignore-auto :noconfirm :preserve-modes))
+	  ;; Otherwise, kill the buffer.
+	  (let (kill-buffer-query-functions) ; No query done when killing buffer
+	    (kill-buffer buf)
+	    (message "Killed non-existing/unreadable file buffer: %s" filename))))))
+  (message "Finished reverting buffers containing unmodified files."))
+
+
 
   ;; (defun create-misenplace-cache
   ;;     "Creates folder and sets up variables for misenplace cache"
@@ -57,8 +86,23 @@
   ;;   )
 
   ;; hide-show config
+  ;; Mode hooks
   (add-hook 'python-mode-hook 'hs-minor-mode)
 
+  ;; (add-to-list 'auto-mode-alist '("\\.tex\\'" . Tex-mode))
+  ;;(dolist (hook '(Tex-latex-mode-hook))
+    ;;(add-hook hook (lambda () (flyspell-mode 1))))
+
+    ;; If you use tex-mode
+    ;; (require 'tex-mode)`
+    ;; (add-hook 'latex-mode-hook 'flyspell-mode)
+
+    ;; If you use AUCTeX
+    ;; (load "auctex.el" nil t t)`
+    (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+
+
+    (add-hook 'python-mode-hook 'flyspell-prog-mode)
 
   (defun test-pos-frame ()
     "A simple pos-frame tester fun"
@@ -418,6 +462,7 @@
   )
 (use-package cmake-ide
   :straight t
+  :after rtags
   :config
   (cmake-ide-setup))
 (use-package command-log-mode
@@ -579,7 +624,7 @@
   :config
   (counsel-projectile-mode)
   ;; TODO: Make check for windows - switch to native plus caching
-  ;; (setq projectile-indexing-method 'native)
+  (setq projectile-indexing-method 'native)
   )
 (use-package csharp-mode
   :straight t
@@ -594,17 +639,30 @@
   (setq dashboard-items '(;; (recents  . 5)
 			  (projects . 5)
 			  ;; (bookmarks . 5)
-			  ;; (agenda . 5)
+			  (agenda . 5)
 			  ;;(registers . 5)
 			  ))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png")
-  (add-to-list 'dashboard-items '(agenda) t)
-  (setq dashboard-week-agenda t)
+  ;; (add-to-list 'dashboard-items '(agenda) t)
+  ;; (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  ;; Match just one TODO keyword.
+  ;; (setq dashboard-match-agenda-entry "NEXT=\"NEXT\"")
+  (setq dashboard-match-agenda-entry "TODO=\"NEXT\"")
+  ;; ;; Match multiple keywords.
+  ;; (setq dashboard-match-agenda-entry
+  ;; "TODO=\"TODO\"|TODO=\"IN-PROGRESS\"")
+  ;;
+  ;; ;; Match everything except WAITING.
+  ;; (setq dashboard-match-agenda-entry
+  ;; "-TODO=\"WAITING\"")
+  (setq dashboard-projects-show-base t)
+
+
   )
 (use-package deft
   :straight t
@@ -633,7 +691,172 @@
 ;;   )
 (use-package doom-modeline
       :straight t
-      :hook (after-init . doom-modeline-mode))
+      :hook (after-init . doom-modeline-mode)
+      :config
+	; How tall the mode-line should be. It's only respected in GUI.
+	;; If the actual char height is larger, it respects the actual height.
+	(setq doom-modeline-height 25)
+
+	;; How wide the mode-line bar should be. It's only respected in GUI.
+	(setq doom-modeline-bar-width 4)
+
+	;; Whether to use hud instead of default bar. It's only respected in GUI.
+	(setq doom-modeline-hud nil)
+
+	;; The limit of the window width.
+	;; If `window-width' is smaller than the limit, some information won't be displayed.
+	(setq doom-modeline-window-width-limit fill-column)
+
+	;; How to detect the project root.
+	;; nil means to use `default-directory'.
+	;; The project management packages have some issues on detecting project root.
+	;; e.g. `projectile' doesn't handle symlink folders well, while `project' is unable
+	;; to hanle sub-projects.
+	;; You can specify one if you encounter the issue.
+	(setq doom-modeline-project-detection 'auto)
+
+	;; Determines the style used by `doom-modeline-buffer-file-name'.
+	;;
+	;; Given ~/Projects/FOSS/emacs/lisp/comint.el
+	;;   auto => emacs/lisp/comint.el (in a project) or comint.el
+	;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
+	;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
+	;;   truncate-with-project => emacs/l/comint.el
+	;;   truncate-except-project => ~/P/F/emacs/l/comint.el
+	;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
+	;;   truncate-all => ~/P/F/e/l/comint.el
+	;;   truncate-nil => ~/Projects/FOSS/emacs/lisp/comint.el
+	;;   relative-from-project => emacs/lisp/comint.el
+	;;   relative-to-project => lisp/comint.el
+	;;   file-name => comint.el
+	;;   buffer-name => comint.el<2> (uniquify buffer name)
+	;;
+	;; If you are experiencing the laggy issue, especially while editing remote files
+	;; with tramp, please try `file-name' style.
+	;; Please refer to https://github.com/bbatsov/projectile/issues/657.
+	(setq doom-modeline-buffer-file-name-style 'auto)
+
+	;; Whether display icons in the mode-line.
+	;; While using the server mode in GUI, should set the value explicitly.
+	(setq doom-modeline-icon (display-graphic-p))
+
+	;; Whether display the icon for `major-mode'. It respects `doom-modeline-icon'.
+	(setq doom-modeline-major-mode-icon t)
+
+	;; Whether display the colorful icon for `major-mode'.
+	;; It respects `all-the-icons-color-icons'.
+	(setq doom-modeline-major-mode-color-icon t)
+
+	;; Whether display the icon for the buffer state. It respects `doom-modeline-icon'.
+	(setq doom-modeline-buffer-state-icon t)
+
+	;; Whether display the modification icon for the buffer.
+	;; It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'.
+	(setq doom-modeline-buffer-modification-icon t)
+
+	;; Whether to use unicode as a fallback (instead of ASCII) when not using icons.
+	(setq doom-modeline-unicode-fallback nil)
+
+	;; Whether display the minor modes in the mode-line.
+	(setq doom-modeline-minor-modes nil)
+
+	;; If non-nil, a word count will be added to the selection-info modeline segment.
+	(setq doom-modeline-enable-word-count nil)
+
+	;; Major modes in which to display word count continuously.
+	;; Also applies to any derived modes. Respects `doom-modeline-enable-word-count'.
+	;; If it brings the sluggish issue, disable `doom-modeline-enable-word-count' or
+	;; remove the modes from `doom-modeline-continuous-word-count-modes'.
+	(setq doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
+
+	;; Whether display the buffer encoding.
+	(setq doom-modeline-buffer-encoding t)
+
+	;; Whether display the indentation information.
+	(setq doom-modeline-indent-info nil)
+
+	;; If non-nil, only display one number for checker information if applicable.
+	(setq doom-modeline-checker-simple-format t)
+
+	;; The maximum number displayed for notifications.
+	(setq doom-modeline-number-limit 99)
+
+	;; The maximum displayed length of the branch name of version control.
+	(setq doom-modeline-vcs-max-length 12)
+
+	;; Whether display the workspace name. Non-nil to display in the mode-line.
+	(setq doom-modeline-workspace-name t)
+
+	;; Whether display the perspective name. Non-nil to display in the mode-line.
+	(setq doom-modeline-persp-name t)
+
+	;; If non nil the default perspective name is displayed in the mode-line.
+	(setq doom-modeline-display-default-persp-name nil)
+
+	;; If non nil the perspective name is displayed alongside a folder icon.
+	(setq doom-modeline-persp-icon t)
+
+	;; Whether display the `lsp' state. Non-nil to display in the mode-line.
+	(setq doom-modeline-lsp t)
+
+	;; Whether display the GitHub notifications. It requires `ghub' package.
+	(setq doom-modeline-github t) ;; default nil
+
+	;; The interval of checking GitHub.
+	(setq doom-modeline-github-interval (* 30 60))
+
+	;; Whether display the modal state icon.
+	;; Including `evil', `overwrite', `god', `ryo' and `xah-fly-keys', etc.
+	(setq doom-modeline-modal-icon t)
+
+	;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
+	(setq doom-modeline-mu4e nil)
+	;; also enable the start of mu4e-alert
+	(mu4e-alert-enable-mode-line-display)
+
+	;; Whether display the gnus notifications.
+	(setq doom-modeline-gnus t)
+
+	;; Whether gnus should automatically be updated and how often (set to 0 or smaller than 0 to disable)
+	(setq doom-modeline-gnus-timer 2)
+
+	;; Wheter groups should be excludede when gnus automatically being updated.
+	(setq doom-modeline-gnus-excluded-groups '("dummy.group"))
+
+	;; Whether display the IRC notifications. It requires `circe' or `erc' package.
+	(setq doom-modeline-irc t)
+
+	;; Function to stylize the irc buffer names.
+	(setq doom-modeline-irc-stylize 'identity)
+
+	;; Whether display the environment version.
+	(setq doom-modeline-env-version t)
+	;; Or for individual languages
+	(setq doom-modeline-env-enable-python t)
+	(setq doom-modeline-env-enable-ruby t)
+	(setq doom-modeline-env-enable-perl t)
+	(setq doom-modeline-env-enable-go t)
+	(setq doom-modeline-env-enable-elixir t)
+	(setq doom-modeline-env-enable-rust t)
+
+	;; Change the executables to use for the language version string
+	(setq doom-modeline-env-python-executable "python") ; or `python-shell-interpreter'
+	(setq doom-modeline-env-ruby-executable "ruby")
+	(setq doom-modeline-env-perl-executable "perl")
+	(setq doom-modeline-env-go-executable "go")
+	(setq doom-modeline-env-elixir-executable "iex")
+	(setq doom-modeline-env-rust-executable "rustc")
+
+	;; What to display as the version while a new one is being loaded
+	(setq doom-modeline-env-load-string "...")
+
+	;; Hooks that run before/after the modeline version string is updated
+	(setq doom-modeline-before-update-env-hook nil)
+	(setq doom-modeline-after-update-env-hook nil)
+	(add-hook 'inferior-ess-mode-hook
+	    (lambda ()
+		(add-to-list 'mode-line-process '(:eval (nth ess--busy-count ess-busy-strings)))))
+      )
 (use-package doom-themes
   :straight t
   :config
@@ -692,10 +915,7 @@
 (use-package ein
   :straight t
   )
-(use-package julia-mode
-  :straight t
-  )
-(use-package jupyter
+(use-package webkit-color-picker
   :straight t
   )
 (use-package emojify
@@ -821,6 +1041,10 @@
   :config
   (evil-snipe-mode +1)
   (evil-snipe-override-mode +1))
+(use-package evil-surround
+  :straight t
+  :config
+  (global-evil-surround-mode 1))
 ;; (use-package evil-nerd-commenter
 ;;   :straight t
 ;;   )
@@ -839,11 +1063,30 @@
   :config
   (global-flycheck-mode t)
 
-  ;; Enable for other modes
+  ;; Enable for other modes ;; TODO: Wait... but isn't it already global? What do I not want it for?
   (add-hook 'c++-mode-hook 'flycheck-mode)
   (add-hook 'web-mode-hook 'flycheck-mode)
   (add-hook 'json-mode-hook 'flycheck-mode)
+  (add-hook 'sh-mode-hook 'flycheck-mode)
+  (setq flycheck-lintr-linters "with_defaults(default = default_linters, line_length_linter = line_length_linter(120), assignment_linter = NULL)")
+  (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
+
+
 )
+
+(use-package flycheck-google-cpplint
+  :straight t
+  :after flycheck
+  :config
+  (flycheck-add-next-checker 'c/c++-cppcheck '(warning . c/c++-googlelint))
+ (custom-set-variables
+  '(flycheck-googlelint-verbose "3")
+  '(flycheck-googlelint-filter "-whitespace,+whitespace/braces")
+  ;; '(flycheck-googlelint-root "project/src")
+  '(flycheck-googlelint-linelength "120"))
+)
+
+
 (use-package flycheck-clojure
   :straight t
   )
@@ -1132,6 +1375,7 @@
    "bp" '(evil-previous-buffer :which-key "previous")
    "bd" '(evil-delete-buffer :which-key "delete")
    "br" '(rename-buffer :which-key "rename")
+   "bR" '(modi/revert-all-file-buffers :which-key "revert all")
 
    ;; Dumb-jump
    "c" '(:ignore t :which-key "code")
@@ -1497,6 +1741,12 @@
 (use-package ivy-rtags
   :straight t
   )
+(use-package julia-mode
+  :straight t
+  )
+(use-package jupyter
+  :straight t
+  )
 (use-package keycast
   :straight t
   :config
@@ -1552,44 +1802,15 @@
   )
 (use-package lsp-mode
   :straight t
-  :commands lsp
-  :config
-
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t)
-
-  (add-to-list 'lsp-language-id-configuration '(TeX-mode . "latex"))
-  (add-to-list 'lsp-language-id-configuration '(csharp-mode . "csharp"))
-  (add-to-list 'lsp-language-id-configuration '(go-mode . "go"))
-  (add-to-list 'lsp-language-id-configuration '(ess-r-mode . "r"))
-  (add-to-list 'lsp-language-id-configuration '(racket-mode . "racket"))
-
-  ;; Add language-mode hooks
-  (add-hook 'go-mode-hook 'lsp)
-  (add-hook 'go-mode-hook 'lsp-mode)
-
-  (add-hook 'ess-r-mode-hook 'lsp-mode)
-  (add-hook 'ess-r-mode-hook 'lsp)
-
-  (add-hook 'lua-mode-hook 'lsp-mode)
-  (add-hook 'lua-mode-hook 'lsp)
-
-  (add-hook 'python-mode-hook 'lsp-mode)
-  (add-hook 'python-mode-hook 'lsp)
-
-
-  (add-hook 'racket-mode-hook 'lsp-mode)
-  (add-hook 'racket-mode-hook 'lsp)
-
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-  (add-hook 'TeX-mode-hook 'lsp)
-  (add-hook 'TeX-mode-hook 'lsp-mode)
-
-  ;; Start LSP Mode and YASnippet mode
-  (add-hook 'go-mode-hook #'lsp-deferred) ;; TODO: Figure out exactly what this line does
-
-)
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         (ess-r-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
 (use-package lua-mode
   :straight t
   )
@@ -2333,6 +2554,10 @@
   :straight t)
 (use-package poly-org
   :straight t)
+(use-package pomodoro
+  :straight t
+  :config
+    (pomodoro-add-to-mode-line))
 (use-package prescient
   :straight t
   :config
@@ -2342,8 +2567,9 @@
   :straight t
   :config
   (projectile-mode)
+  (setq projectile-sort-order 'recentf)
   (setq projectile-completion-system 'ivy)
-  (defun projectile-test-suffix (project-type)
+  (defun projectile-test-suffix (project-type) ;; tmi: expand these for more languages (C++,python, etc.)
     "Find default test files suffix based on PROJECT-TYPE."
     (cond
      ((member project-type '(rails-rspec ruby-rspec)) "_spec")
@@ -2352,6 +2578,7 @@
      ((member project-type '(scons)) "test")
      ((member project-type '(maven symfony)) "Test")
      ((member project-type '(gradle grails)) "Spec")))
+
 
   )
 (use-package pyvenv
@@ -2505,6 +2732,12 @@
 (use-package tree-sitter-langs
   :straight t
   )
+(use-package webkit
+  :straight (:type git :host github :repo "akirakyle/emacs-webkit"
+             :branch "main"
+             :files (:defaults "*.js" "*.css" "*.so")
+             :pre-build ("make"))
+  )
 (use-package which-key
   :straight t
   :config
@@ -2518,6 +2751,10 @@
   :straight t
   :config
   (add-hook 'prog-mode-hook #'ws-butler-mode))
+(use-package wrap-region
+  :straight t
+  :config
+  (wrap-region-mode t))
 (use-package yasnippet
   :straight t
   :config
@@ -2583,6 +2820,13 @@
  ;; If there is more than one, they won't work right.
  '(tab-bar ((t (:background "dim gray" :foreground "#1d2021" :box nil))))
  '(tab-bar-tab ((t (:background "#100011" :foreground "#c5d4dd" :box nil)))))
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
+;; (add-to-list 'load-path "~/.emacs.d/")
+;; (require 'google-c-style)
+;; (add-hook 'c-mode-common-hook 'google-set-c-style)
+
 
 
 ;; Local Variables:
