@@ -1,0 +1,14 @@
+* Todos                                                               :Emacs:
+* TODO Figure out why keycast package doesn't work
+2021-08-23 Mon]
+[file:~/.emacs.d/init.el::(add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: Figure out why keycast package doesn't work]]
+* TODO Add check if project exists for make-python-project function
+2021-08-23 Mon]
+[file:~/.emacs.d/init.el::;; TODO: Add check if project already exists for make-python-project]]
+* TODO Set lsp mode automatically for certain filetypes
+[2021-09-06 Mon]
+[[file:~/.emacs.d/init.el::;; Misenplace:]]
+* TODO expand these for more languages (C++,python, etc.)
+* TODO Fix project order in dashboard to be mru
+* NEXT add origami minor mode hook to c++-mode
+* TODO Investigate what archive tags do in org-mode

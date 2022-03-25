@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: header
+# key: hd
+# expand-env: ((yas-indent-line 'fixed))
+# --
+
+# {{{ Header
+# Name: cyclic_coordinate_descent.r
+# Author: Jordan Schupbach
+# Description: $1
+# }}} Header

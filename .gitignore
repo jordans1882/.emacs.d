@@ -25,6 +25,7 @@ request/
 server/
 straight/
 transient/
+tramp
 var/
 forge-database.sqlite
 personal-configs.el
