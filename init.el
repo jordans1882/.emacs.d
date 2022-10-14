@@ -27,8 +27,43 @@
 ;; Use packages with configs
 
 
+'(setq image-mode-map (make-sparse-keymap))
+'(setq pdf-view-mode-map (make-sparse-keymap))
+'(setq treemacs-mode-map (make-sparse-keymap))
+
+'(progn (define-key image-mode-map (kbd ",") nil))
+'(progn (define-key pdf-view-mode-map (kbd ",") nil))
+'(progn (define-key pdf-view-mode-map (kbd "<normal-state> ,") nil))
+'(progn (define-key image-mode-map (kbd "<normal-state> ,") nil))
+
 (use-package emacs
   :config
+
+  (global-auto-revert-mode t)
+
+(defun my/center (width)
+  (interactive "nBuffer width: ")
+  (let* ((adj          (- (window-text-width)
+                          width))
+         (total-margin (+ adj
+                          left-margin-width
+                          right-margin-width)))
+    (setq left-margin-width  (/ total-margin 2))
+    (setq right-margin-width (- total-margin left-margin-width)))
+  (set-window-buffer (selected-window) (current-buffer)))
+
+
+  (defun disable-display-line-numbers-mode-hook ()
+    (display-line-numbers-mode -1))
+
+  (add-hook 'help-mode-hook 'disable-display-line-numbers-mode-hook)
+
+
+  (defun my-clear ()
+    (interactive)
+    (let ((comint-buffer-maximum-size 0))
+	(comint-truncate-buffer)))
+
 
   ;; Set Warning Level
   (setq warning-minimum-level :emergency)
@@ -66,7 +101,8 @@
       ;; do not try to revert non-file buffers like *Messages*.
       (when (and filename
 		 (not (buffer-modified-p buf)))
-	(if (file-readable-p filename) ;; If the file exists and is readable, revert the buffer.
+	(if (file-
+readable-p filename) ;; If the file exists and is readable, revert the buffer.
 	    (with-current-buffer buf
 	      (revert-buffer :ignore-auto :noconfirm :preserve-modes))
 	  ;; Otherwise, kill the buffer.
@@ -76,6 +112,8 @@
   (message "Finished reverting buffers containing unmodified files."))
 
 
+  ;; Language mode configs - Java
+  (add-hook 'java-mode-hook 'hs-minor-mode)
 
   ;; (defun create-misenplace-cache
   ;;     "Creates folder and sets up variables for misenplace cache"
@@ -120,18 +158,38 @@
 
   (defvar dark-mode t)
 
+  (generate-new-buffer "*std-err*")
+
+  (defun setup-wal ()
+    (progn
+      (setenv "LD_THEME" "dark")
+      (shell-command "export LD_THEME=dark" "*std-err*")
+      (setq  dark-mode nil)))
+  (setup-wal)
+
   (defun  toggle-dark-mode ()
     "Toggle Dark mode"
     (interactive)
     (if dark-mode
 	(progn
-	    (counsel-load-theme-action "base16-humanoid-light")
-	    (message "Dark mode was on")
-	    (setq  dark-mode nil))
+	  (setenv "LD_THEME" "light")
+	  (shell-command "export LD_THEME=light" "*std-err*")
+	  (shell-command "waldark" "*std-err*")
+	  (counsel-load-theme-action "doom-opera-light")
+	  (setq  dark-mode nil))
 	(progn
-	    (counsel-load-theme-action "base16-darktooth")
-	    (message "Dark mode was off")
-	    (setq  dark-mode t))))
+          (setenv "LD_THEME" "dark")
+	  (shell-command "export LD_THEME=dark" "*std-err*")
+	  (counsel-load-theme-action "base16-darktooth")
+	  (setq  dark-mode t)
+	  (shell-command "waldark" "*std-err*"))))
+
+  (defun runwal ()
+    (interactive)
+    (shell-command "waldark" "*std-err*" "*std-err*")
+    )
+
+  ;; (run-with-timer 0 (* 1 60) 'runwal)
 
   (defun dawn ()
     "Set theme to dawn"
@@ -186,6 +244,21 @@
     (process-send-string target-buffer com)
     (next-line)
   )
+
+
+  (defun increase-picom-transparency ()
+    "Send a line to process defined by target-buffer."
+    (interactive)
+    (call-process-shell-command "inc_picom_emacs&" nil 0)
+  )
+
+
+  (defun decrease-picom-transparency ()
+    "Send a line to process defined by target-buffer."
+    (interactive)
+    (call-process-shell-command "dec_picom_emacs&" nil 0)
+  )
+
 
   (setq python-shell-interpreter "ipython")
   (setq python-shell-interpreter-args "--simple-prompt -i")
@@ -315,6 +388,192 @@
   ;; Tab bar settings
   (set-face-attribute 'tab-bar-tab nil :inherit 'doom-modeline-panel :foreground nil :background nil)
 
+
+  ;; Gant char stuff
+
+ (defun prop_ ()
+   (interactive)
+   (setq properties-list '(":TYPE: Task" ":DEP: none" ":PROGRESS: 0"))
+
+   (insert ":PROPERTIES:\n")
+   (org-cycle)
+
+   (dolist (elt properties-list)
+     (insert  elt)
+     (insert "\n")
+     (org-cycle)
+     )
+   (insert ":END:\n"))
+ (global-set-key (kbd "C-=") 'prop_)
+
+
+  (defun get_all_headings (arr deep)
+   (let ( (size (length arr)) (i 2));;get the size of the arr
+     (while ( < i size );;iterate for each headings/subheadings
+	(setq name (plist-get (elt (elt arr i) 1) :title))
+	(setq scheduled (plist-get (elt (elt arr i) 1) :scheduled))
+	(setq deadline (plist-get (elt (elt arr i) 1) :deadline))
+	(setq todo (plist-get (elt (elt arr i) 1) :todo-type))
+	(setq priority (plist-get (elt (elt arr i) 1) :priority))
+	(setq l nil)
+	(add-to-list 'l name)
+	(add-to-list 'l deep)
+	(if priority nil (setq priority 100))
+	(add-to-list 'l priority)
+	(add-to-list 'l  "na")
+
+	(setq scheduled_vect nil)
+	(if scheduled
+	    (let ((tt (elt scheduled 1)) )
+	      (add-to-list 'l t)
+	      (setq ys (plist-get tt :year-start))
+	      (setq ms (plist-get tt :month-start))
+	      (setq ds (plist-get tt :day-start))
+	      (setq hs (plist-get tt :hour-start))
+	      (setq mins (plist-get tt :minute-start))
+	      (unless hs (setq hs 0) )
+	      (unless mins (setq mins 0) )
+	      (setq ts (+ (* (- ys 2020) 8760) (* (calendar-day-number (list ms ds ys)) 24) hs (/ mins 60.0)))
+	      (setq scheduled_vect (vector ts hs ds ms ys))
+	      )
+	  )
+
+	(setq deadline_vect nil)
+	(if deadline
+	    (let ((tt (elt deadline 1)) )
+
+	      (add-to-list 'l t)
+	      (setq ysd (plist-get tt :year-start))
+	      (setq msd (plist-get tt :month-start))
+	      (setq dsd (plist-get tt :day-start))
+	      (setq hsd (plist-get tt :hour-start))
+	      (setq minsd (plist-get tt :minute-start))
+	      (unless hsd (setq hsd 0) )
+	      (unless minsd (setq minsd 0) )
+	      (setq tsd (+ (* (- ysd 2020) 8760) (* (calendar-day-number (list msd dsd ysd)) 24) hsd (/ minsd 60.0)))
+	      (setq deadline_vect (vector tsd hsd dsd msd ysd))
+	      )
+	  (if scheduled
+	      (setq deadline_vect (vector (1+ ts) hs ds ms ys))
+	    nil
+	    )
+	  )
+	(if scheduled
+	    (let ((a 1))
+	      (add-to-list 'l (vector scheduled_vect deadline_vect))
+	      (if (> minT ts)
+		  (setq minT ts)
+		nil)
+	      (if (< maxT tsd)
+		  (setq maxT tsd)
+		nil)
+	      )
+	  (add-to-list 'l nil)
+	  )
+
+	(if (< (elt (reverse l) 2) 68)
+	    (let ((a 1))
+	      (add-to-list 'ordered_arr (reverse l))
+	      (get_all_headings (elt arr i) (1+ deep))
+	      )
+	  nil
+	  )
+	(setq i (1+ i))
+	)
+     )
+
+   )
+
+
+ (defun draw-gantt ()
+   "draw a gantt svg "
+   (interactive)
+   (get-org-heading-info)
+   (require 'svg)
+   (setq H 600)
+   (setq W (window-pixel-width ))
+   (setq sx 150)
+   (setq sy 25)
+   (setq Fsize 10)
+   (setq svg (svg-create W H :stroke "black" ))
+   (svg-rectangle svg 0 0 W H :fill "#ffffff" :stroke-width 0)
+
+   (setq size (length ordered_arr))
+   (setq i 0)
+   (setq arr (reverse ordered_arr))
+   (setq dt (float (- maxT minT)))
+   (setq dx (float (- W sx)))
+   (while (< i size)
+     (let ((deep (elt (elt arr i) 1))
+	    (name (elt (elt arr i) 0))
+	    (visible (elt (elt arr i) 4)) )
+
+	(if (= deep 0)
+	    (svg-line svg 0 (+ sy (+ 2 (* i (+ Fsize 4)))) W (+ sy (+ 2 (* i (+ Fsize 4)))))
+	  nil
+	  )
+
+	(svg-text svg name :x (+ 3 (* 8 deep)) :y (+ sy (* i (+ Fsize 4))) :stroke-width 0.5 :font-size (concat (number-to-string Fsize) "px") :font-family "Helvetica")
+	(if visible
+	    (let ((ts (elt (elt (elt (elt arr i) 5) 0) 0))
+		  (te (elt (elt (elt (elt arr i) 5) 1) 0)))
+
+	      (svg-rectangle svg  (+ sx (* dx (/ (- ts minT) dt))) (+ (- sy Fsize) 1 (* i (+ Fsize 4)))  (* dx (/ (- te ts) dt)) (+ -2 Fsize) :fill (color-cycle i size))
+	      (if (< (elt (elt arr i) 2) 68 )
+		  (let ( (day  (elt (elt (elt (elt arr i) 5) 0) 2))
+			 (month  (elt (elt (elt (elt arr i) 5) 0) 3)) )
+		    (svg-line svg (+ sx (* dx (/ (- ts minT) dt))) (- (- sy Fsize) 2) (+ sx (* dx (/ (- ts minT) dt))) H :stroke-dasharray 4)
+		    (svg-text svg (format "%02d/%02d" day month) :x (- (+ sx (* dx (/ (- ts minT) dt))) 15) :y (+ Fsize 1) :stroke-width 0.5 :font-size (concat (number-to-string Fsize) "px") :font-family "Helvetica")
+		    )
+		)
+	      )
+	  nil
+	  )
+	(setq i (1+ i))
+	)
+     )
+   (setq tnow (+ (* (- (elt (calendar-current-date) 2) 2020) 8760) (* (calendar-day-number (calendar-current-date)) 24)))
+   (if (> tnow minT)
+	(let ((a 1))
+	  (svg-line svg (+ sx (* dx (/ (- tnow minT) dt))) (- (- sy Fsize) 2) (+ sx (* dx (/ (- tnow minT) dt))) H :stroke-dasharray 4 :stroke "red")
+	  )
+     nil
+     )
+   ;; create or get a gantt buffer
+   (let (($buf (get-buffer-create "*gantt*")))
+     (with-current-buffer $buf
+	(erase-buffer)
+	(svg-insert-image svg));;insert the svh
+     (display-buffer-in-side-window $buf `((side . bottom)
+					    (window-height . ,(+ 2 size)) ;;backquote + coma to evaluate var
+					    (slot . 0)));;display the window at the bottom
+     )
+   )
+ (global-set-key (kbd "C-=") 'draw-gantt)
+
+ (defun get-org-heading-info ()
+   "show org-heading-components result"
+   (interactive)
+   (setq z (org-element-parse-buffer 'headline))
+   (setq ordered_arr nil)
+   (setq minT 100000)
+   (setq maxT 0)
+   (get_all_headings z 0)
+   )
+
+ (defun color-cycle(i len)
+   (setq fr 0.1)
+   (setq center 128)
+   (setq width 127)
+   (setq phase (/ 6.28 3))
+   (setq red (floor (+ (* (sin (+ (* fr i) 0)) width) center)))
+   (setq green (floor (+ (* (sin (+ (* fr i) 2)) width) center)))
+   (setq blue (floor (+ (* (sin (+ (* fr i) 4)) width) center)))
+   (format "#%02x%02x%02x" red green blue)
+   )
+
+
+
   )
 (use-package ace-jump-mode
   :straight t
@@ -368,6 +627,9 @@
   :straight t
   :config
   (beacon-mode 1)
+  )
+(use-package centered-window-mode
+  :straight t
   )
 (use-package cheatsheet
   :straight t
@@ -472,11 +734,13 @@
   :straight t
   :config
   (add-hook 'shell-mode-hook 'company-mode)
+  (setq company-idle-delay 0)
+
+
   ;;(add-to-list 'auto-mode-alist '("\\.h\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.hpp\\'" . company-mode))
   ;;(add-to-list 'auto-mode-alist '("\\.cpp\\'" . company-mode))
   )
-
 (use-package company-ctags
   :straight t
   :after company
@@ -499,6 +763,13 @@
         (define-key counsel-gtags-mode-map (kbd "M-r") 'counsel-gtags-find-reference)
         (define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
         (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)))
+
+(use-package company-quickhelp
+  :straight t
+  :config
+  (company-quickhelp-mode)
+)
+
 (use-package conda
   :straight t
   :init
@@ -595,7 +866,6 @@
 (use-package counsel
   :straight t
   )
-
 (use-package counsel-etags
   :straight t
   :ensure t
@@ -608,7 +878,6 @@
   :config
     (setq counsel-etags-update-interval 60)
     (push "build" counsel-etags-ignore-directories))
-
 (use-package counsel-tramp
   :straight t
   )
@@ -624,14 +893,30 @@
   :config
   (counsel-projectile-mode)
   ;; TODO: Make check for windows - switch to native plus caching
-  (setq projectile-indexing-method 'native)
+  ;; (setq projectile-indexing-method 'native)
+  (setq projectile-indexing-method 'hybrid)
   )
 (use-package csharp-mode
   :straight t
   )
 (use-package dap-mode
   :straight t
+  :after lsp-mode
+  :config
+  (dap-auto-configure-mode)
   )
+(use-package dap-java
+  :ensure nil
+  :config
+    (dap-register-debug-template "Runner"
+				(list :type "java"
+				    :request "launch"
+				    :args ""
+				    :vmArgs "-ea -Dmyapp.instance.name=myapp_1"
+				    :projectName "myapp"
+				    :mainClass "edu.msu.utilities.LinSpace"
+				    :env '(("DEV" . "1"))))
+)
 (use-package dashboard
   :straight t
   :config
@@ -646,7 +931,7 @@
   (setq dashboard-set-file-icons t)
   (setq dashboard-startup-banner "~/.emacs.d/_assets/mise_en_place.png")
   ;; (add-to-list 'dashboard-items '(agenda) t)
-  ;; (setq dashboard-week-agenda t)
+  (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
@@ -897,6 +1182,10 @@
 ;;   )
 ;; (require 'eaf-browser)
 ;; (require 'eaf-pdf-viewer)
+(use-package editorconfig
+  :straight t
+  :config
+  (editorconfig-mode 1))
 (use-package epc
   :straight t
   )
@@ -906,6 +1195,62 @@
 (use-package egg-timer
   :straight t
   )
+(use-package elgantt
+  :straight (elgantt :type git
+                     :host github
+                     :repo "legalnonsense/elgantt"
+                     :branch "master")
+  :config
+  (setq elgantt-agenda-files "~/git_repos/test/todo.org")
+  (setq elgantt-user-set-color-priority-counter 0)
+  (elgantt-create-display-rule draw-scheduled-to-deadline
+    :parser ((elgantt-color . ((when-let ((colors (org-entry-get (point) "ELGANTT-COLOR")))
+                                 (s-split " " colors)))))
+    :args (elgantt-scheduled elgantt-color elgantt-org-id)
+    :body ((when elgantt-scheduled
+             (let ((point1 (point))
+                   (point2 (save-excursion
+                             (elgantt--goto-date elgantt-scheduled)
+                             (point)))
+                   (color1 (or (car elgantt-color)
+                               "black"))
+                   (color2 (or (cadr elgantt-color)
+                               "red")))
+               (when (/= point1 point2)
+                 (elgantt--draw-gradient
+                  color1
+                  color2
+                  (if (< point1 point2) point1 point2) ;; Since cells are not necessarily linked in
+                  (if (< point1 point2) point2 point1) ;; chronological order, make sure they are sorted
+                  nil
+                  `(priority ,(setq elgantt-user-set-color-priority-counter
+                                    (1- elgantt-user-set-color-priority-counter))
+                             ;; Decrease the priority so that earlier entries take
+                             ;; precedence over later ones (note: it doesn’t matter if the number is negative)
+                             :elgantt-user-overlay ,elgantt-org-id)))))))
+    (elgantt-create-display-rule show-hashtag-links
+    :args (elgantt-hashtag)
+    :post-command-hook t ;; update each time the point is moved
+    :body ((elgantt--clear-juxtapositions nil nil 'hashtag-link) ;; Need to clear the last display
+	    (when elgantt-hashtag ;; only do it if there is a hashtag property at the cell
+	    (elgantt--connect-cells :elgantt-alltags elgantt-hashtag 'hashtag-link '(:foreground "red")))))
+
+    (elgantt-create-action follow-hashtag-link-forward
+    :args (elgantt-alltags)
+    :binding "C-M-f"
+    :body ((when-let* ((hashtag (--first (s-starts-with-p "#" it)
+					elgantt-alltags))
+			(point (car (elgantt--next-match :elgantt-alltags hashtag))))
+	    (goto-char point))))
+
+    (elgantt-create-action follow-hashtag-link-backward
+    :args (elgantt-alltags)
+    :binding "C-M-b"
+    :body ((when-let* ((hashtag (--first (s-starts-with-p "#" it)
+					elgantt-alltags))
+			(point (car (elgantt--previous-match :elgantt-alltags hashtag))))
+	    (goto-char point))))
+    )
 (use-package elpy
   :straight t
   :init
@@ -924,6 +1269,9 @@
 (use-package ess
   :straight t
   :config
+
+  (add-hook 'ess-r-help-mode-hook 'disable-display-line-numbers-mode-hook)
+  (add-hook 'inferior-ess-mode-hook 'disable-display-line-numbers-mode-hook)
   (setq ess-use-flymake nil) ;; disable Flymake
   (add-to-list 'auto-mode-alist '("\\.r\\'" . ess-r-mode))
   (add-to-list 'auto-mode-alist '("\\.R\\'" . ess-r-mode))
@@ -1013,6 +1361,8 @@
    (define-key my-leader-map "wd" 'evil-window-delete)
 
    ;; Define/rebind evil-mode-normal-state maps
+
+   (define-key evil-normal-state-map (kbd "K") 'evil-goto-definition)
    (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-page-up)
    (define-key evil-normal-state-map (kbd "q") 'evil-delete-buffer)
    (define-key evil-normal-state-map (kbd "Q") 'evil-record-macro)
@@ -1071,9 +1421,27 @@
   (setq flycheck-lintr-linters "with_defaults(default = default_linters, line_length_linter = line_length_linter(120), assignment_linter = NULL)")
   (add-hook 'c++-mode-hook (lambda () (setq flycheck-gcc-language-standard "c++11")))
 
+  (defun my-save-word ()
+  (interactive)
+  (let ((current-location (point))
+	(word (flyspell-get-word)))
+    (when (consp word)
+      (flyspell-do-correct 'save nil (car word) current-location (cadr word) (caddr word) current-location))))
+
 
 )
-
+(use-package flycheck-grammarly
+  :straight t
+  :config
+    (with-eval-after-load 'flycheck
+	(flycheck-grammarly-setup))
+    )
+(use-package flycheck-rust
+  :straight t
+  :after rust-mode
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+)
 (use-package flycheck-google-cpplint
   :straight t
   :after flycheck
@@ -1085,8 +1453,6 @@
   ;; '(flycheck-googlelint-root "project/src")
   '(flycheck-googlelint-linelength "120"))
 )
-
-
 (use-package flycheck-clojure
   :straight t
   )
@@ -1096,6 +1462,11 @@
 (use-package format-all
   :straight t
   )
+(use-package fzf
+  :straight t
+  )
+(use-package geiser-mit
+  :straight t)
 (use-package general
   :straight t
   :after (:all which-key hydra org-super-agenda)
@@ -1121,6 +1492,9 @@
      :states '(normal visual insert)
      :keymaps '(global-map evil-normal-state-map override)
      ;; "C-c C-c" 'evilnc-comment-or-uncomment-lines ;; TODO: find a new bind for commenting
+
+     "H-C-=" 'increase-picom-transparency
+     "H-C--" 'decrease-picom-transparency
      "C-=" 'text-scale-increase
      "C--" 'text-scale-decrease
      "C-w" 'tab-bar-close-tab
@@ -1163,7 +1537,8 @@
      "C-<tab>" 'tab-bar-switch-to-next-tab
      [(control shift iso-lefttab)] 'tab-bar-switch-to-prev-tab
      "ESC ESC ESC" 'evil-normal-state
-     "C-k" 'kill-word
+     ;; "C-k" 'kill-word
+     "C-k" 'projectile-compile-project
      )
 
   ;; TODO: add override to keymaps?
@@ -1188,6 +1563,14 @@
      "C-i" 'gumshoe-persp-backtrack-forward
      )
 
+
+
+
+
+
+
+
+
   (general-define-key ;; treemacs
      :states '(normal visual treemacs)
      :keymaps '(treemacs-mode-map)
@@ -1196,7 +1579,21 @@
      "C-<tab>" 'tab-bar-switch-to-next-tab
      "M-<tab>" 'tab-bar-switch-to-next-tab
      "M-l" 'evil-window-right
+     "r" 'treemacs-rename-file
+     "l" 'treemacs-toggle-node
+     "h" 'treemacs-collapse-parent-node
+     "D" 'treemacs-delete-file
+     "C-r" 'treemacs-refresh
   )
+
+  (general-define-key ;; company
+     :states '(normal visual company)
+     :keymaps '(company-active-map company-search-map)
+     "C-n" 'company-select-next
+     "C-p" 'company-select-previous
+     "C-t" 'company-search-toggle-filtering
+     )
+
 
   (general-define-key ;; lisp interaction
      :states '(normal visual)
@@ -1237,7 +1634,27 @@
      )
 
 
+  (general-define-key ;; python-mode-map
+     :states '(normal visual)
+     :keymaps '(pdf-view-mode-map)
+     ;; "M-<RET>" '(bg-elpy-shell-send-statement-and-step :which-key "send")
+     ",w" '(:ignore t :which-key "Window")
+     ",wh" '(:ignore t :which-key "left")
+     ",wl" '(:ignore t :which-key "right")
+     ",wj" '(:ignore t :which-key "down")
+     ",wk" '(:ignore t :which-key "up")
+     )
 
+  (general-define-key ;; python-mode-map
+     :states '(normal visual)
+     :keymaps '(image-mode-map)
+     ;; "M-<RET>" '(bg-elpy-shell-send-statement-and-step :which-key "send")
+     ",w" '(:ignore t :which-key "Window")
+     ",wh" '(:ignore t :which-key "left")
+     ",wl" '(:ignore t :which-key "right")
+     ",wj" '(:ignore t :which-key "down")
+     ",wk" '(:ignore t :which-key "up")
+     )
 
 
   (general-define-key ;; python-mode-map
@@ -1288,6 +1705,10 @@
      "M-<RET>" 'ess-eval-region-or-line-and-step
      "<C-M-return>" 'ess-eval-function-or-paragraph-and-step
 
+     ;; "M-<RET>" 'r-vterm-send-region-or-current-line
+     ;; "<C-M-return>" 'r-vterm-send-region-or-current-line
+
+
      ",l" '(:ignore t :which-key "R")
      ",ldi" '(asb-ess-R-object-popup-str :which-key "inspect")
      ",ldI" '(asb-ess-R-object-popup-interactive :which-key "interactive inspect")
@@ -1308,7 +1729,8 @@
   (general-define-key ;; org-mode bindings
      :states '(normal visual)
      :keymaps '(org-mode-map)
-
+     "M-C-<return>" 'org-babel-execute-src-block
+     "M-C-e" 'org-latex-export-to-pdf
      "M-o" 'org-open-at-point
      "M-l" 'evil-window-right
      "M-j" 'evil-window-down
@@ -1383,7 +1805,7 @@
 
    ;; Dumb-jump
    "d" '(:ignore t :which-key "dumb-jump")
-   "dd" '(dumb-jump-go :which-key "go")
+   "dd" '(evil-goto-definition :which-key "go")
    "db" '(dumb-jump-back :which-key "back")
    "do" '(dumb-jump-go-other-window :which-key "go other")
    "dq" '(dumb-jump-quick-look :which-key "quick-look")
@@ -1484,7 +1906,7 @@
    ;; "pq" '(projectile-kill-buffers :which-key "quit")
    "pq" '(persp-kill :which-key "quit")
    "pr" '(counsel-projectile-rg :which-key "ripgrep")
-   "psn" '(projectile-run-shell :which-key "shell")
+   "ps" '(projectile-run-vterm :which-key "shell")
    "pt" '(:ignore t :which-key "test")
    "ptt" '(projectile-test-project :which-key "test all")
    "ptt" '(projectile-find-test-file :which-key "file")
@@ -1568,6 +1990,7 @@
    "y" '(:ignore t :which-key "yasnippets")
    "yy" '(yas-insert-snippet :which-key "insert snippet")
    "yc" '(yas-new-snippet :which-key "new snippet")
+   "ye" '(yas-visit-snippet-file :which-key "new snippet")
 
    ;; Folds
    "z" '(:ignore t :which-key "folds")
@@ -1583,7 +2006,7 @@
    )
 
   (misenplace/leader-keys ;; apply evil-normal to pdf-view?????
-     :keymaps '(global-map evil-normal-state-map pdf-view-mode-map))
+     :keymaps '(global-map evil-normal-state-map pdf-view-mode-map treemacs-mode-map))
   )
 (use-package git-link
   :straight t
@@ -1684,6 +2107,10 @@
   (custom-set-variables
  '(helm-ag-base-command "rg --no-heading")
  `(helm-ag-success-exit-status '(0 2))))
+(use-package helm-lsp
+  :straight t
+)
+
 (use-package helm-swoop
   :straight t
   )
@@ -1747,6 +2174,9 @@
 (use-package jupyter
   :straight t
   )
+(use-package kotlin-mode
+  :straight t
+  )
 (use-package keycast
   :straight t
   :config
@@ -1760,6 +2190,13 @@
         (remove-hook 'pre-command-hook 'keycast-mode-line-update)))
 
   (add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: Figure out why keycast package doesn't work
+(use-package langtool
+  :straight t
+  :config
+  (setq langtool-java-classpath
+      "/usr/share/languagetool:/usr/share/java/languagetool/*")
+  (setq langtool-mother-tongue "en")
+)
 (use-package link-hint
   :straight t
 )
@@ -1806,6 +2243,8 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (java-mode . lsp)
+         (kotlin-mode . lsp)
          (python-mode . lsp)
          (ess-r-mode . lsp)
          ;; if you want which-key integration
@@ -1832,6 +2271,71 @@
   :straight t
   :commands
   lsp-ivy-workspace-symbol)
+(use-package lsp-java ;; TODO: fix lsp for java
+  ;; :after lsp
+  :straight t
+  :init
+    ;; (setq lsp-java-java-path "/usr/lib/jvm/default/bin/java")
+    (setq lsp-java-java-path "/usr/lib/jvm/java-18-jdk/bin/java")
+    ;; (setenv "JAVA_HOME"  "/usr/bin/java")
+    ;; (setq lsp-java-workspace-dir "~/work/navy/JSAPPHIRE/")
+    (setq lsp-java-import-gradle-java-home "/usr/lib/jvm/java-18-jdk/bin/java")
+    ;; (setq lsp-java-configuration-runtimes '[(:name "JavaSE-18" :path "usr/lib/jvm/default/bin/java" :default t)])
+
+  ;; (setq lsp-java-configuration-runtimes '[(:name "Default" :path "/usr/lib/jvm/default-runtime/" :default t)
+  ;; 					  (:name "Java-18-openjdk" :path "/usr/lib/jvm/java-18-openjdk/")])
+
+    ;; (setq lsp-java-vmargs (list "-noverify" "--enable-preview"))
+  :config
+  ;; Enable dap-java
+  (require 'dap-java)
+
+  ;; Support Lombok in our projects, among other things
+  (setq lsp-java-vmargs
+        (list "-noverify"
+              "-Xmx2G"
+              "-XX:+UseG1GC"
+              "-XX:+UseStringDeduplication"
+              (concat "-javaagent:" jmi/lombok-jar)
+              (concat "-Xbootclasspath/a:" jmi/lombok-jar))
+        lsp-file-watch-ignored
+        '(".idea" ".ensime_cache" ".eunit" "node_modules"
+          ".git" ".hg" ".fslckout" "_FOSSIL_"
+          ".bzr" "_darcs" ".tox" ".svn" ".stack-work"
+          "build")
+
+        lsp-java-import-order '["" "java" "javax" "#"]
+        ;; Don't organize imports on save
+        lsp-java-save-action-organize-imports nil
+	)
+
+        ;; Formatter profile
+        ;; lsp-java-format-settings-url
+        ;; (concat "file://" jmi/java-format-settings-file))
+    ;; (setq-default lsp-java-import-gradle-enabled t)
+    ;; (setq-default lsp-java-import-maven-enabled f)
+    (add-hook 'java-mode-hook #'lsp)
+    ;; (setq max-lisp-eval-depth 10000)
+    ;; (setq lsp-java-imports-gradle-wrapper-checksums [(:sha256 "e2b82129ab64751fd40437007bd2f7f2afb3c6e41a9198e628650b22d5824a14" :allowed true)])
+    ;; (add-hook 'java-mode-hook 'lsp)
+    ;; (progn (add-hook 'java-mode-hook 'lsp)
+    ;; 	   (require 'dap-java))
+    ;; (setq lsp-java-gradle-version "7.4.2")
+    ;; (setq lsp-java-import-gradle-wrapper-enabled f)
+
+    (dap-register-debug-template "Runner"
+				(list :type "java"
+				    :request "launch"
+				    :args ""
+				    :vmArgs "-ea -Dmyapp.instance.name=myapp_1"
+				    :projectName "myapp"
+				    :mainClass "edu.msu.utilities.LinSpace"
+				    :env '(("DEV" . "1"))))
+)
+(use-package dap-java :ensure nil)
+(use-package lsp-ui
+  :straight t
+  )
 ;; (use-package lsp-latex
 ;;   :commands
 ;;   (with-eval-after-load "tex-mode"
@@ -1891,6 +2395,10 @@
 ;;   (setq mu4e-refile-folder "/[Gmail].All Mail")
 ;;   (setq mu4e-trash-folder "/[Gmail].Trash")
 ;;   )
+(use-package multi-vterm
+  :straight t
+  :config
+  )
 (use-package native-complete
   :straight (:host github :repo "CeleritasCelery/emacs-native-shell-complete")
   :config
@@ -1906,8 +2414,9 @@
   )
 (use-package ob-mermaid
   :straight t
+  :after org
   :config
-  (setq ob-mermaid-cli-path "~/mermaid/node_modules/.bin/mmdc"))
+  (setq ob-mermaid-cli-path "~/node_modules/.bin/mmdc"))
 (use-package ob-async
   :straight t
   )
@@ -2038,8 +2547,10 @@
   (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . nil)
+      (mermaid . t)
       (shell . t)
       (python . t)
+      (scheme . t)
       ;; (julia . t)
       (C . t)
       (R . t)))
@@ -2123,10 +2634,28 @@
 	   "* TODO %?")
 	  ))
   )
+(use-package org-contrib
+  :straight t
+  )
+;; (use-package org-plus-contrib
+;;   :straight t
+;;   )
 (use-package org-auto-tangle
   :straight t
   :defer t
   :hook (org-mode . org-auto-tangle-mode))
+(use-package org-gantt-mode
+  :straight (org-gantt-mode :type git
+                            :host gitlab
+                            :repo "joukeHijlkema/org-gantt"
+                            :branch "master")
+  )
+;; (use-package org-gantt
+;;   :straight (org-gantt :type git
+;;                        :host github
+;;                        :repo "SeungukShin/org-gantt"
+;;                        :branch "master")
+;;   )
 (use-package ox-reveal
   :straight t
   :config
@@ -2196,6 +2725,13 @@
       (org-roam-directory (file-truename "~/org/org-roam/"))
       (org-roam-dailies-directory (file-truename "~/org/org-roam-daily/"))
       :config
+
+    (defun jab/search-roam ()
+	"Run consult-ripgrep on the org roam directory"
+	(interactive)
+	(consult-ripgrep org-roam-directory nil))
+
+
       (org-roam-db-autosync-mode)
 
       (setq org-roam-capture-templates
@@ -2522,6 +3058,14 @@
   :straight t
   :magic ("%PDF" . pdf-view-mode)
   :config
+
+  (defun enable-pdf-view-themed-minor-mode-hook ()
+    (pdf-view-themed-minor-mode 1))
+
+
+  (add-hook 'pdf-view-mode-hook 'disable-display-line-numbers-mode-hook)
+  (add-hook 'pdf-view-mode-hook 'enable-pdf-view-themed-minor-mode-hook)
+
   (evil-make-overriding-map pdf-view-mode-map 'normal)
   (evil-define-key 'normal pdf-view-mode-map
   "h" 'image-backward-hscroll
@@ -2618,6 +3162,16 @@
 (use-package rtags
   :straight t
   )
+(use-package rust-mode
+  :straight t
+  :enusre t
+  :after lsp lsp-rust
+  :hook ((rust-mode . flycheck-mode)
+	 (rust-mode . lsp-deferred))
+  :config
+  (setq rust-format-on-save t)
+  (add-hook 'rust-mode-hook #'lsp)
+  )
 (use-package skeletor
   :straight t
   )
@@ -2708,10 +3262,10 @@
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
-(use-package treemacs-evil
-  :straight t
-  :after (:all treemacs evil)
-  )
+;; (use-package treemacs-evil
+;;   :straight t
+;;   :after (:all treemacs evil)
+;;   )
 (use-package treemacs-projectile
   :straight t
   :after (:all treemacs projectile)
@@ -2779,6 +3333,12 @@
 (use-package visual-regexp-steroids
   :straight t
   )
+(use-package vterm
+  :straight t
+  :config
+  (add-hook 'vterm-mode-hook 'disable-display-line-numbers-mode-hook)
+(setq display-line-numbers-mode nil)
+  )
 ;; (use-package weatherline-mode
 ;;   :straight (:host github :repo "aaron-em/weatherline-mode.el")
 ;;   )
@@ -2824,6 +3384,15 @@
  '(tab-bar-tab ((t (:background "#100011" :foreground "#c5d4dd" :box nil)))))
 
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") )
+
+
+(if (file-exists-p "~/.emacs.d/ess-vterm.el")
+    (load-file "~/.emacs.d/ess-vterm.el"))
+
+(add-hook 'ess-r-mode-hook #'r-vterm-mode)
+
+(load-file "~/.emacs.d/hide-comnt.el")
 
 ;; (add-to-list 'load-path "~/.emacs.d/")
 ;; (require 'google-c-style)

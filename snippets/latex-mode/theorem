@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: theorem
+# key: theorem
+# --
+
+\begin{theorem}[$1]
+$2
+\end{theorem}

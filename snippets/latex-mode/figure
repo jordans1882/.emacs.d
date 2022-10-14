@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: figure
+# key: fig
+# --
+
+  \begin{figure}
+    \includegraphics[width=.7\linewidth]{figures/$1}
+    \caption{$2}
+    \label{$3}
+  \end{figure}

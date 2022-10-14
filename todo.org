@@ -1,14 +1,113 @@
-* Todos                                                               :Emacs:
-* TODO Figure out why keycast package doesn't work
-2021-08-23 Mon]
-[file:~/.emacs.d/init.el::(add-to-list 'global-mode-string '("" mode-line-keycast " "))) ;; TODO: Figure out why keycast package doesn't work]]
-* TODO Add check if project exists for make-python-project function
-2021-08-23 Mon]
-[file:~/.emacs.d/init.el::;; TODO: Add check if project already exists for make-python-project]]
-* TODO Set lsp mode automatically for certain filetypes
-[2021-09-06 Mon]
-[[file:~/.emacs.d/init.el::;; Misenplace:]]
-* TODO expand these for more languages (C++,python, etc.)
-* TODO Fix project order in dashboard to be mru
-* NEXT add origami minor mode hook to c++-mode
-* TODO Investigate what archive tags do in org-mode
+#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d
+#+PROPERTY: allocate_ALL dev doc test
+#+COLUMNS: %30ITEM(Task) %Effort %allocate %BLOCKER %ORDERED
+
+* Accounting Software                                        :taskjuggler_project:
+
+** TODO Specification
+   :PROPERTIES:
+   :Effort:   20d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+** TODO Software Development
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  previous-sibling
+   :priority: 1000
+   :allocate: dev
+   :END:
+
+*** TODO Database coupling
+    :PROPERTIES:
+    :Effort:   20d
+    :END:
+
+*** TODO Back-End Functions
+    :PROPERTIES:
+    :Effort:   30d
+    :task_id:  back_end
+    :END:
+
+*** TODO Graphical User Interface
+    :PROPERTIES:
+    :Effort:   35d
+    :allocate: paul, seb
+    :END:
+
+** TODO Software testing
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  previous-sibling
+   :allocate: test
+   :END:
+*** TODO Alpha Test
+    :PROPERTIES:
+    :Effort:   5d
+    :task_id:  alpha
+    :END:
+
+*** TODO Beta Test
+    :PROPERTIES:
+    :Effort:   20d
+    :task_id:  beta
+    :allocate: test, paul
+    :END:
+
+** TODO Manual
+   :PROPERTIES:
+   :Effort:   50d
+   :task_id:  manual
+   :BLOCKER:  start
+   :allocate: doc
+   :END:
+
+** TODO Milestones
+*** TODO Project start
+    :PROPERTIES:
+    :task_id:  start
+    :END:
+
+*** TODO Technology Preview
+    :PROPERTIES:
+    :BLOCKER:  back_end
+    :END:
+
+*** TODO Beta version
+    :PROPERTIES:
+    :BLOCKER:  alpha
+    :END:
+
+*** TODO Ship Product to Customer
+    :PROPERTIES:
+    :BLOCKER:  beta manual
+    :END:
+
+
+* Resources                                         :taskjuggler_resource:
+** Developers
+   :PROPERTIES:
+   :resource_id: dev
+   :END:
+*** Paul Smith
+    :PROPERTIES:
+    :resource_id: paul
+    :END:
+*** Sébastien Bono
+    :PROPERTIES:
+    :resource_id: seb
+    :END:
+*** Klaus Müller
+
+** Others
+*** Peter Murphy
+    :PROPERTIES:
+    :resource_id: doc
+    :limits:   { dailymax 6.4h }
+    :END:
+*** Dim Sung
+    :PROPERTIES:
+    :resource_id: test
+    :END:
+* TODO Some test todo
