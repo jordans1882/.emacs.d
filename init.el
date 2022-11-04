@@ -1,6 +1,6 @@
-;; misenplace:
+;; Misenplace:
 
-;; my emacs config
+;; My Emacs config
 
 ;; (require 'package)
 ;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -38,6 +38,8 @@
 
 (use-package emacs
   :config
+  (menu-bar-bottom-and-right-window-divider)
+  (window-divider-mode)
 
   (global-auto-revert-mode t)
 
@@ -2248,7 +2250,26 @@ readable-p filename) ;; If the file exists and is readable, revert the buffer.
          (python-mode . lsp)
          (ess-r-mode . lsp)
          ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
+         (lsp-mode . lsp-enable-which-key-integration)
+	 (setq lsp-enable-symbol-highlighting nil)
+	 (setq lsp-ui-doc-enable nil)
+ 	 (setq lsp-ui-doc-show-with-cursor nil)
+	 (setq lsp-ui-doc-show-with-mouse nil)
+	 (setq lsp-lens-enable nil)
+	 (setq lsp-ui-sideline-show-hover nil)
+	 (setq lsp-ui-sideline-enable nil)
+	 (setq lsp-modeline-code-actions-enable nil)
+	 (setq lsp-diagnostics-provider :none)
+	 (setq lsp-ui-sideline-enable nil)
+	 (setq lsp-ui-sideline-show-diagnostics nil)
+	 (setq lsp-eldoc-enable-hover nil)
+
+
+
+
+
+
+	 )
   :commands lsp)
 (use-package lua-mode
   :straight t
